@@ -19,7 +19,7 @@ func idOf(instanceId, sourceId string) model.InstanceId {
 }
 
 func instanceWithId(instanceId string) model.Instance {
-	inst := &model.SimulatorInstance{Type: "co.yellowdog.platform.model.SimulatorInstance"}
+	inst := &model.SimulatorInstance{}
 	inst.Id = optional.Of(idOf(instanceId, "source-1"))
 	return inst
 }

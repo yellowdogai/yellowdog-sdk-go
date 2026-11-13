@@ -69,8 +69,9 @@ type AttributeValue interface {
 func (*NumericAttributeValue) isAttributeValue() {}
 func (*StringAttributeValue) isAttributeValue()  {}
 
-// The interface implemented by all compute source model objects. A compute source describes a
-// specific source for acquiring instances in order to meet the compute requirement.
+// The interface implemented by all compute source model objects.
+// A compute source describes a specific source for acquiring instances in order to meet the compute
+// requirement.
 //
 //yd:polymorphic discriminator=type
 type ComputeSource interface {
@@ -89,9 +90,10 @@ func (*OciInstancePoolComputeSource) isComputeSource()  {}
 func (*OciInstancesComputeSource) isComputeSource()     {}
 func (*SimulatorComputeSource) isComputeSource()        {}
 
-// Describes an instance provisioned for a compute requirement. This class provides common fields
-// shared across all compute provisioners. It is generally specialised for each provisioner to add
-// extra fields specific to that provisioner.
+// Describes an instance provisioned for a compute requirement.
+//
+// This class provides common fields shared across all compute provisioners. It is generally
+// specialised for each provisioner to add extra fields specific to that provisioner.
 //
 //yd:polymorphic discriminator=type
 type Instance interface {
@@ -120,9 +122,9 @@ type ClusterProvider interface {
 
 func (*EksClusterProvider) isClusterProvider() {}
 
-// The interface implemented by all compute provision strategy model objects. A compute provision
-// strategy determines the behaviour of YellowDog Compute when trying to acquire and release
-// instances to meet the compute requirement.
+// The interface implemented by all compute provision strategy model objects.
+// A compute provision strategy determines the behaviour of YellowDog Compute when trying to acquire
+// and release instances to meet the compute requirement.
 //
 //yd:polymorphic discriminator=type
 type ComputeProvisionStrategy interface {

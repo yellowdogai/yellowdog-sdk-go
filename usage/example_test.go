@@ -30,7 +30,7 @@ func ExampleAllowancesClient() {
 	ctx := context.Background()
 
 	// An account-wide allowance capping total compute hours per month.
-	allowance := model.NewAccountAllowance()
+	allowance := &model.AccountAllowance{}
 	allowance.Description = optional.Of("Monthly compute budget")
 	allowance.AllowedHours = 500
 	allowance.ResetType = model.AllowanceResetTypeMonths

@@ -24,7 +24,6 @@ func newTestWorkerPoolClient(t *testing.T, handler http.HandlerFunc) *WorkerPool
 func configuredWorkerPoolJSON(t *testing.T, status model.WorkerPoolStatus, id string) []byte {
 	t.Helper()
 	pool := &model.ConfiguredWorkerPool{
-		Type:   "co.yellowdog.platform.model.ConfiguredWorkerPool",
 		Id:     optional.Of(id),
 		Status: optional.Of(status),
 	}
@@ -38,8 +37,7 @@ func configuredWorkerPoolJSON(t *testing.T, status model.WorkerPoolStatus, id st
 func provisionedWorkerPoolJSON(t *testing.T, id string) []byte {
 	t.Helper()
 	pool := &model.ProvisionedWorkerPool{
-		Type: "co.yellowdog.platform.model.ProvisionedWorkerPool",
-		Id:   optional.Of(id),
+		Id: optional.Of(id),
 	}
 	b, err := json.Marshal(pool)
 	if err != nil {
@@ -144,7 +142,6 @@ func TestWaitForWorkers_StreamsUntilMinimumReached(t *testing.T) {
 func workerPoolWithClaimedCount(t *testing.T, id string, claimed int) []byte {
 	t.Helper()
 	pool := &model.ConfiguredWorkerPool{
-		Type:          "co.yellowdog.platform.model.ConfiguredWorkerPool",
 		Id:            optional.Of(id),
 		WorkerSummary: optional.Of(model.WorkerSummary{ClaimedWorkerCount: claimed}),
 	}

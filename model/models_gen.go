@@ -14,12 +14,7 @@ type ApiKey struct {
 
 // Holds the Role ARN and External ID required to allow YellowDog Platform to assume an assigned
 // role in an external AWS account.
-//
-// AwsAccountRoleCredential must be created with NewAwsAccountRoleCredential, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type AwsAccountRoleCredential struct {
-	Type            string                       `json:"type"`
 	Name            string                       `json:"name"`
 	Description     optional.Optional[string]    `json:"description,omitzero"`
 	ExternalRoleArn string                       `json:"externalRoleArn"`
@@ -31,12 +26,7 @@ func (a *AwsAccountRoleCredential) GetName() string { return a.Name }
 
 // Holds the Access Key ID and Secret Access Key which form a set of credentials for Amazon Web
 // Services (AWS).
-//
-// AwsCredential must be created with NewAwsCredential, which sets the type discriminator the
-// platform uses to resolve the subtype. A bare struct literal leaves it empty and the request is
-// rejected.
 type AwsCredential struct {
-	Type            string                       `json:"type"`
 	Name            string                       `json:"name"`
 	Description     optional.Optional[string]    `json:"description,omitzero"`
 	AccessKeyId     string                       `json:"accessKeyId"`
@@ -48,12 +38,7 @@ type AwsCredential struct {
 func (a *AwsCredential) GetName() string { return a.Name }
 
 // Holds the properties that form a set of credentials for Microsoft Azure.
-//
-// AzureClientCredential must be created with NewAzureClientCredential, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type AzureClientCredential struct {
-	Type           string                    `json:"type"`
 	Name           string                    `json:"name"`
 	Description    optional.Optional[string] `json:"description,omitzero"`
 	ClientId       string                    `json:"clientId"`
@@ -65,12 +50,7 @@ type AzureClientCredential struct {
 func (a *AzureClientCredential) GetName() string { return a.Name }
 
 // Holds an admin user name and password to be used for created instances in Microsoft Azure.
-//
-// AzureInstanceCredential must be created with NewAzureInstanceCredential, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type AzureInstanceCredential struct {
-	Type          string                    `json:"type"`
 	Name          string                    `json:"name"`
 	Description   optional.Optional[string] `json:"description,omitzero"`
 	AdminUsername string                    `json:"adminUsername"`
@@ -79,11 +59,7 @@ type AzureInstanceCredential struct {
 
 func (a *AzureInstanceCredential) GetName() string { return a.Name }
 
-// AzureStorageCredential must be created with NewAzureStorageCredential, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type AzureStorageCredential struct {
-	Type        string                       `json:"type"`
 	Name        string                       `json:"name"`
 	Description optional.Optional[string]    `json:"description,omitzero"`
 	AccountName string                       `json:"accountName"`
@@ -93,11 +69,7 @@ type AzureStorageCredential struct {
 
 func (a *AzureStorageCredential) GetName() string { return a.Name }
 
-// GoogleCloudCredential must be created with NewGoogleCloudCredential, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type GoogleCloudCredential struct {
-	Type                  string                       `json:"type"`
 	Name                  string                       `json:"name"`
 	Description           optional.Optional[string]    `json:"description,omitzero"`
 	ServiceAccountKeyJson string                       `json:"serviceAccountKeyJson"`
@@ -107,12 +79,7 @@ type GoogleCloudCredential struct {
 func (g *GoogleCloudCredential) GetName() string { return g.Name }
 
 // Holds the properties that form a set of credentials for Oracle Cloud Infrastructure (OCI).
-//
-// OciCredential must be created with NewOciCredential, which sets the type discriminator the
-// platform uses to resolve the subtype. A bare struct literal leaves it empty and the request is
-// rejected.
 type OciCredential struct {
-	Type        string                       `json:"type"`
 	Name        string                       `json:"name"`
 	Description optional.Optional[string]    `json:"description,omitzero"`
 	UserId      string                       `json:"userId"`
@@ -163,11 +130,7 @@ type Account struct {
 	Features []Feature                 `json:"features,omitempty"`
 }
 
-// AccountAllowance must be created with NewAccountAllowance, which sets the type discriminator the
-// platform uses to resolve the subtype. A bare struct literal leaves it empty and the request is
-// rejected.
 type AccountAllowance struct {
-	Type                  string                       `json:"type"`
 	Id                    optional.Optional[string]    `json:"id,omitzero" yd:"systemGenerated"`
 	Description           optional.Optional[string]    `json:"description,omitzero"`
 	CreatedById           optional.Optional[string]    `json:"createdById,omitzero" yd:"systemGenerated"`
@@ -199,7 +162,7 @@ type Application struct {
 	Id              optional.Optional[string] `json:"id,omitzero" yd:"systemGenerated"`
 	Name            string                    `json:"name"`
 	Description     optional.Optional[string] `json:"description,omitzero"`
-	CreatedByUserId string                    `json:"createdByUserId"`
+	CreatedByUserId string                    `json:"createdByUserId" yd:"systemGenerated"`
 	AccessDelegates []AccessDelegate          `json:"accessDelegates,omitempty"`
 }
 
@@ -215,12 +178,7 @@ type AwsCapacityReservation struct {
 }
 
 // Defines a source of compute provisioned using an AWS EC2 Fleet request.
-//
-// AwsFleetComputeSource must be created with NewAwsFleetComputeSource, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type AwsFleetComputeSource struct {
-	Type                                    string                                     `json:"type"`
 	Traits                                  optional.Optional[ComputeSourceTraits]     `json:"traits,omitzero"`
 	InstancePricing                         optional.Optional[InstancePricing]         `json:"instancePricing,omitzero"`
 	Id                                      optional.Optional[string]                  `json:"id,omitzero" yd:"systemGenerated"`
@@ -293,11 +251,7 @@ type AwsFleetSpotOptions struct {
 }
 
 // Extends Instance to add fields specific to the AWS compute sources.
-//
-// AwsInstance must be created with NewAwsInstance, which sets the type discriminator the platform
-// uses to resolve the subtype. A bare struct literal leaves it empty and the request is rejected.
 type AwsInstance struct {
-	Type              string                            `json:"type"`
 	InstanceLifecycle optional.Optional[string]         `json:"instanceLifecycle,omitzero"`
 	Id                optional.Optional[InstanceId]     `json:"id,omitzero"`
 	CreatedTime       optional.Optional[time.Time]      `json:"createdTime,omitzero"`
@@ -312,17 +266,13 @@ type AwsInstance struct {
 	Spot              bool                              `json:"spot"`
 	Status            optional.Optional[InstanceStatus] `json:"status,omitzero"`
 	StatusChangedTime optional.Optional[time.Time]      `json:"statusChangedTime,omitzero"`
+	NextStatus        optional.Optional[InstanceStatus] `json:"nextStatus,omitzero"`
 }
 
 func (a *AwsInstance) GetId() InstanceId { v, _ := a.Id.Get(); return v }
 
 // Defines a source of compute composed of AWS EC2 instances using the RunInstances API.
-//
-// AwsInstancesComputeSource must be created with NewAwsInstancesComputeSource, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type AwsInstancesComputeSource struct {
-	Type                                    string                                     `json:"type"`
 	Traits                                  optional.Optional[ComputeSourceTraits]     `json:"traits,omitzero"`
 	InstancePricing                         optional.Optional[InstancePricing]         `json:"instancePricing,omitzero"`
 	Id                                      optional.Optional[string]                  `json:"id,omitzero" yd:"systemGenerated"`
@@ -390,12 +340,7 @@ type AzureAccountAuthenticationProperties struct {
 }
 
 // Extends Instance to add fields specific to the Azure compute source.
-//
-// AzureInstance must be created with NewAzureInstance, which sets the type discriminator the
-// platform uses to resolve the subtype. A bare struct literal leaves it empty and the request is
-// rejected.
 type AzureInstance struct {
-	Type              string                            `json:"type"`
 	ResourceId        optional.Optional[string]         `json:"resourceId,omitzero"`
 	Id                optional.Optional[InstanceId]     `json:"id,omitzero"`
 	CreatedTime       optional.Optional[time.Time]      `json:"createdTime,omitzero"`
@@ -410,15 +355,12 @@ type AzureInstance struct {
 	Spot              bool                              `json:"spot"`
 	Status            optional.Optional[InstanceStatus] `json:"status,omitzero"`
 	StatusChangedTime optional.Optional[time.Time]      `json:"statusChangedTime,omitzero"`
+	NextStatus        optional.Optional[InstanceStatus] `json:"nextStatus,omitzero"`
 }
 
 func (a *AzureInstance) GetId() InstanceId { v, _ := a.Id.Get(); return v }
 
-// AzureInstancesComputeSource must be created with NewAzureInstancesComputeSource, which sets the
-// type discriminator the platform uses to resolve the subtype. A bare struct literal leaves it
-// empty and the request is rejected.
 type AzureInstancesComputeSource struct {
-	Type                          string                                     `json:"type"`
 	Traits                        optional.Optional[ComputeSourceTraits]     `json:"traits,omitzero"`
 	Id                            optional.Optional[string]                  `json:"id,omitzero" yd:"systemGenerated"`
 	CreatedFromId                 optional.Optional[string]                  `json:"createdFromId,omitzero" yd:"systemGenerated"`
@@ -455,11 +397,7 @@ type AzureInstancesComputeSource struct {
 func (a *AzureInstancesComputeSource) GetId() string   { v, _ := a.Id.Get(); return v }
 func (a *AzureInstancesComputeSource) GetName() string { return a.Name }
 
-// AzureScaleSetComputeSource must be created with NewAzureScaleSetComputeSource, which sets the
-// type discriminator the platform uses to resolve the subtype. A bare struct literal leaves it
-// empty and the request is rejected.
 type AzureScaleSetComputeSource struct {
-	Type                          string                                     `json:"type"`
 	Traits                        optional.Optional[ComputeSourceTraits]     `json:"traits,omitzero"`
 	Id                            optional.Optional[string]                  `json:"id,omitzero" yd:"systemGenerated"`
 	CreatedFromId                 optional.Optional[string]                  `json:"createdFromId,omitzero" yd:"systemGenerated"`
@@ -526,13 +464,9 @@ type BestComputeSourceReportImageAvailability struct {
 	SupportedInstanceTypes []string                         `json:"supportedInstanceTypes,omitempty"`
 }
 
-// BestComputeSourceReportNumericConstraint must be created with
-// NewBestComputeSourceReportNumericConstraint, which sets the type discriminator the platform uses
-// to resolve the subtype. A bare struct literal leaves it empty and the request is rejected.
 type BestComputeSourceReportNumericConstraint struct {
-	Type string                     `json:"type"`
-	Min  optional.Optional[float64] `json:"min,omitzero"`
-	Max  optional.Optional[float64] `json:"max,omitzero"`
+	Min optional.Optional[float64] `json:"min,omitzero"`
+	Max optional.Optional[float64] `json:"max,omitzero"`
 }
 
 type BestComputeSourceReportPreference struct {
@@ -541,13 +475,10 @@ type BestComputeSourceReportPreference struct {
 	HighestValue optional.Optional[interface{}] `json:"highestValue,omitzero"`
 }
 
-// BestComputeSourceReportSource must be created with NewBestComputeSourceReportSource, which sets
-// the type discriminator the platform uses to resolve the subtype. A bare struct literal leaves it
-// empty and the request is rejected.
 type BestComputeSourceReportSource struct {
 	SourceTemplateId    optional.Optional[string]                         `json:"sourceTemplateId,omitzero"`
 	ProvisionedSourceId optional.Optional[string]                         `json:"provisionedSourceId,omitzero"`
-	Type                string                                            `json:"type"`
+	Type                optional.Optional[string]                         `json:"type,omitzero"`
 	Name                optional.Optional[string]                         `json:"name,omitzero"`
 	Provider            optional.Optional[CloudProvider]                  `json:"provider,omitzero"`
 	Region              optional.Optional[string]                         `json:"region,omitzero"`
@@ -564,11 +495,7 @@ type BestComputeSourceReportSourceAttribute struct {
 	Percentile optional.Optional[float64]     `json:"percentile,omitzero"`
 }
 
-// BestComputeSourceReportStringConstraint must be created with
-// NewBestComputeSourceReportStringConstraint, which sets the type discriminator the platform uses
-// to resolve the subtype. A bare struct literal leaves it empty and the request is rejected.
 type BestComputeSourceReportStringConstraint struct {
-	Type    string                    `json:"type"`
 	AnyOf   []string                  `json:"anyOf,omitempty"`
 	NoneOf  []string                  `json:"noneOf,omitempty"`
 	Pattern optional.Optional[string] `json:"pattern,omitzero"`
@@ -599,7 +526,7 @@ func (c *Cluster) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if len(aux.ClusterProvider) > 0 {
+	if len(aux.ClusterProvider) > 0 && string(aux.ClusterProvider) != "null" {
 		elem, err := ClusterProviderRegistry.Unmarshal(aux.ClusterProvider)
 		if err != nil {
 			return fmt.Errorf("unmarshaling clusterProvider: %w", err)
@@ -610,15 +537,12 @@ func (c *Cluster) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ClusterOperation must be created with NewClusterOperation, which sets the type discriminator the
-// platform uses to resolve the subtype. A bare struct literal leaves it empty and the request is
-// rejected.
 type ClusterOperation struct {
-	Type         ClusterOperationType         `json:"type"`
-	CreatedTime  optional.Optional[time.Time] `json:"createdTime,omitzero"`
-	FinishedTime optional.Optional[time.Time] `json:"finishedTime,omitzero"`
-	Successful   optional.Optional[bool]      `json:"successful,omitzero"`
-	Message      optional.Optional[string]    `json:"message,omitzero"`
+	Type         optional.Optional[ClusterOperationType] `json:"type,omitzero"`
+	CreatedTime  optional.Optional[time.Time]            `json:"createdTime,omitzero"`
+	FinishedTime optional.Optional[time.Time]            `json:"finishedTime,omitzero"`
+	Successful   optional.Optional[bool]                 `json:"successful,omitzero"`
+	Message      optional.Optional[string]               `json:"message,omitzero"`
 }
 
 // // A specification to provision a Cluster from a ClusterProvider.
@@ -643,7 +567,7 @@ func (c *ClusterSpec) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if len(aux.ClusterProvider) > 0 {
+	if len(aux.ClusterProvider) > 0 && string(aux.ClusterProvider) != "null" {
 		elem, err := ClusterProviderRegistry.Unmarshal(aux.ClusterProvider)
 		if err != nil {
 			return fmt.Errorf("unmarshaling clusterProvider: %w", err)
@@ -654,9 +578,11 @@ func (c *ClusterSpec) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Defines the requirement for compute resource and chosen options for how to provision it. This
-// class is the main model object within the YellowDog Compute API. It is passed between the service
-// and clients in order to request compute resource and to monitor the state of that resource.
+// Defines the requirement for compute resource and chosen options for how to provision it.
+//
+// This class is the main model object within the YellowDog Compute API. It is passed between the
+// service and clients in order to request compute resource and to monitor the state of that
+// resource.
 type ComputeRequirement struct {
 	Id                    optional.Optional[string]                                `json:"id,omitzero" yd:"systemGenerated"`
 	CreatedTime           optional.Optional[time.Time]                             `json:"createdTime,omitzero" yd:"systemGenerated"`
@@ -673,6 +599,8 @@ type ComputeRequirement struct {
 	MaintainInstanceCount bool                                                     `json:"maintainInstanceCount"`
 	Status                optional.Optional[ComputeRequirementStatus]              `json:"status,omitzero" yd:"systemGenerated"`
 	NextStatus            optional.Optional[ComputeRequirementStatus]              `json:"nextStatus,omitzero"`
+	AutoShutdown          optional.Optional[AutoShutdown]                          `json:"autoShutdown,omitzero"`
+	AutoShutdownTime      optional.Optional[time.Time]                             `json:"autoShutdownTime,omitzero" yd:"systemGenerated"`
 }
 
 func (c *ComputeRequirement) UnmarshalJSON(data []byte) error {
@@ -688,7 +616,7 @@ func (c *ComputeRequirement) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if len(aux.ProvisionStrategy) > 0 {
+	if len(aux.ProvisionStrategy) > 0 && string(aux.ProvisionStrategy) != "null" {
 		elem, err := ComputeProvisionStrategyRegistry.Unmarshal(aux.ProvisionStrategy)
 		if err != nil {
 			return fmt.Errorf("unmarshaling provisionStrategy: %w", err)
@@ -699,11 +627,7 @@ func (c *ComputeRequirement) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ComputeRequirementDynamicTemplate must be created with NewComputeRequirementDynamicTemplate,
-// which sets the type discriminator the platform uses to resolve the subtype. A bare struct literal
-// leaves it empty and the request is rejected.
 type ComputeRequirementDynamicTemplate struct {
-	Type               string                                       `json:"type"`
 	Id                 optional.Optional[string]                    `json:"id,omitzero" yd:"systemGenerated"`
 	Name               string                                       `json:"name"`
 	Namespace          optional.Optional[string]                    `json:"namespace,omitzero"`
@@ -766,11 +690,7 @@ func (c *ComputeRequirementDynamicTemplate) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ComputeRequirementStaticTemplate must be created with NewComputeRequirementStaticTemplate, which
-// sets the type discriminator the platform uses to resolve the subtype. A bare struct literal
-// leaves it empty and the request is rejected.
 type ComputeRequirementStaticTemplate struct {
-	Type         string                    `json:"type"`
 	Id           optional.Optional[string] `json:"id,omitzero" yd:"systemGenerated"`
 	Name         string                    `json:"name"`
 	Namespace    optional.Optional[string] `json:"namespace,omitzero"`
@@ -832,7 +752,7 @@ func (c *ComputeSourceTemplate) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	if len(aux.Source) > 0 {
+	if len(aux.Source) > 0 && string(aux.Source) != "null" {
 		elem, err := ComputeSourceRegistry.Unmarshal(aux.Source)
 		if err != nil {
 			return fmt.Errorf("unmarshaling source: %w", err)
@@ -864,11 +784,7 @@ type ComputeSourceUsage struct {
 	ImageId          optional.Optional[string] `json:"imageId,omitzero"`
 }
 
-// ConfiguredWorkerPool must be created with NewConfiguredWorkerPool, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type ConfiguredWorkerPool struct {
-	Type              string                                            `json:"type"`
 	Id                optional.Optional[string]                         `json:"id,omitzero" yd:"systemGenerated"`
 	Name              optional.Optional[string]                         `json:"name,omitzero"`
 	Namespace         optional.Optional[string]                         `json:"namespace,omitzero"`
@@ -911,11 +827,7 @@ type DoubleRange struct {
 	Max optional.Optional[float64] `json:"max,omitzero"`
 }
 
-// EksClusterProvider must be created with NewEksClusterProvider, which sets the type discriminator
-// the platform uses to resolve the subtype. A bare struct literal leaves it empty and the request
-// is rejected.
 type EksClusterProvider struct {
-	Type           string   `json:"type"`
 	Region         string   `json:"region"`
 	ClusterRoleArn string   `json:"clusterRoleArn"`
 	NodeRoleArn    string   `json:"nodeRoleArn"`
@@ -926,11 +838,7 @@ type EksClusterProvider struct {
 }
 
 // Represents an external user within the YellowDog Platform.
-//
-// ExternalUser must be created with NewExternalUser, which sets the type discriminator the platform
-// uses to resolve the subtype. A bare struct literal leaves it empty and the request is rejected.
 type ExternalUser struct {
-	Type                   string                    `json:"type"`
 	ExternalId             string                    `json:"externalId" yd:"systemGenerated"`
 	AuthenticationProvider AuthenticationProvider    `json:"authenticationProvider" yd:"systemGenerated"`
 	Id                     optional.Optional[string] `json:"id,omitzero" yd:"systemGenerated"`
@@ -946,18 +854,16 @@ func (e *ExternalUser) GetName() string { return e.Name }
 
 // Policy that can be specified in a RunSpecification to control what to do before a Task
 // transitions to the TaskStatusFailed status. The FailurePolicy is always applied after the
-// RetryPolicy. A FailurePolicy can be used in conjunction with a RetryPolicy or the deprecated
+// RetryPolicy.
+//
+// A FailurePolicy can be used in conjunction with a RetryPolicy or the deprecated
 // RunSpecification.SetMaximumTaskRetries}/RunSpecification.SetRetryableErrors.
 type FailurePolicy struct {
 	ResubmissionDestinations []ResubmissionDestination `json:"resubmissionDestinations"`
 }
 
 // Extends Instance to add fields specific to the Google Compute Engine (GCE) compute source.
-//
-// GceInstance must be created with NewGceInstance, which sets the type discriminator the platform
-// uses to resolve the subtype. A bare struct literal leaves it empty and the request is rejected.
 type GceInstance struct {
-	Type              string                            `json:"type"`
 	Preemptible       bool                              `json:"preemptible"`
 	Confidential      bool                              `json:"confidential"`
 	Id                optional.Optional[InstanceId]     `json:"id,omitzero"`
@@ -973,18 +879,14 @@ type GceInstance struct {
 	Spot              bool                              `json:"spot"`
 	Status            optional.Optional[InstanceStatus] `json:"status,omitzero"`
 	StatusChangedTime optional.Optional[time.Time]      `json:"statusChangedTime,omitzero"`
+	NextStatus        optional.Optional[InstanceStatus] `json:"nextStatus,omitzero"`
 }
 
 func (g *GceInstance) GetId() InstanceId { v, _ := g.Id.Get(); return v }
 
 // Defines a source of compute composed of Google Compute Engine (GCE) instances organised into an
 // Instance Group.
-//
-// GceInstanceGroupComputeSource must be created with NewGceInstanceGroupComputeSource, which sets
-// the type discriminator the platform uses to resolve the subtype. A bare struct literal leaves it
-// empty and the request is rejected.
 type GceInstanceGroupComputeSource struct {
-	Type                      string                                         `json:"type"`
 	Traits                    optional.Optional[ComputeSourceTraits]         `json:"traits,omitzero"`
 	Id                        optional.Optional[string]                      `json:"id,omitzero" yd:"systemGenerated"`
 	CreatedFromId             optional.Optional[string]                      `json:"createdFromId,omitzero" yd:"systemGenerated"`
@@ -997,6 +899,8 @@ type GceInstanceGroupComputeSource struct {
 	BootVolumeSizeGb          optional.Optional[int]                         `json:"bootVolumeSizeGb,omitzero"`
 	SshKeys                   optional.Optional[string]                      `json:"sshKeys,omitzero"`
 	ServiceAccountEmail       optional.Optional[string]                      `json:"serviceAccountEmail,omitzero"`
+	Reservation               optional.Optional[string]                      `json:"reservation,omitzero"`
+	ReservationBound          bool                                           `json:"reservationBound"`
 	Project                   string                                         `json:"project"`
 	Region                    string                                         `json:"region"`
 	Zone                      optional.Optional[string]                      `json:"zone,omitzero"`
@@ -1025,12 +929,7 @@ func (g *GceInstanceGroupComputeSource) GetName() string { return g.Name }
 
 // Defines a source of compute composed of Google Compute Engine (GCE) instances individually
 // provisioned.
-//
-// GceInstancesComputeSource must be created with NewGceInstancesComputeSource, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type GceInstancesComputeSource struct {
-	Type                         string                                         `json:"type"`
 	Traits                       optional.Optional[ComputeSourceTraits]         `json:"traits,omitzero"`
 	Id                           optional.Optional[string]                      `json:"id,omitzero" yd:"systemGenerated"`
 	CreatedFromId                optional.Optional[string]                      `json:"createdFromId,omitzero" yd:"systemGenerated"`
@@ -1045,6 +944,8 @@ type GceInstancesComputeSource struct {
 	BootVolumeSizeGb             optional.Optional[int]                         `json:"bootVolumeSizeGb,omitzero"`
 	SshKeys                      optional.Optional[string]                      `json:"sshKeys,omitzero"`
 	ServiceAccountEmail          optional.Optional[string]                      `json:"serviceAccountEmail,omitzero"`
+	Reservation                  optional.Optional[string]                      `json:"reservation,omitzero"`
+	ReservationBound             bool                                           `json:"reservationBound"`
 	Project                      string                                         `json:"project"`
 	Region                       string                                         `json:"region"`
 	Zone                         optional.Optional[string]                      `json:"zone,omitzero"`
@@ -1084,7 +985,7 @@ type Group struct {
 	Name        string                    `json:"name"`
 	Description optional.Optional[string] `json:"description,omitzero"`
 	Roles       []GroupRole               `json:"roles,omitempty"`
-	AdminGroup  bool                      `json:"adminGroup"`
+	AdminGroup  bool                      `json:"adminGroup" yd:"systemGenerated"`
 }
 
 type GroupRole struct {
@@ -1120,11 +1021,7 @@ type IntegerRange struct {
 }
 
 // Represents an internal user within the YellowDog Platform.
-//
-// InternalUser must be created with NewInternalUser, which sets the type discriminator the platform
-// uses to resolve the subtype. A bare struct literal leaves it empty and the request is rejected.
 type InternalUser struct {
-	Type            string                    `json:"type"`
 	Username        string                    `json:"username"`
 	Id              optional.Optional[string] `json:"id,omitzero" yd:"systemGenerated"`
 	Name            string                    `json:"name"`
@@ -1151,13 +1048,10 @@ type KeyringAccessor struct {
 	AccessorName optional.Optional[string] `json:"accessorName,omitzero"`
 }
 
-// KeyringCredential must be created with NewKeyringCredential, which sets the type discriminator
-// the platform uses to resolve the subtype. A bare struct literal leaves it empty and the request
-// is rejected.
 type KeyringCredential struct {
 	Name        optional.Optional[string] `json:"name,omitzero"`
 	Description optional.Optional[string] `json:"description,omitzero"`
-	Type        string                    `json:"type"`
+	Type        optional.Optional[string] `json:"type,omitzero"`
 }
 
 type LongRange struct {
@@ -1267,11 +1161,7 @@ func (n *NodeActionGroup) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NodeCreateWorkersAction must be created with NewNodeCreateWorkersAction, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type NodeCreateWorkersAction struct {
-	Type         string                              `json:"action"`
 	NodeWorkers  optional.Optional[NodeWorkerTarget] `json:"nodeWorkers,omitzero"`
 	TotalWorkers optional.Optional[int]              `json:"totalWorkers,omitzero"`
 	NodeIdFilter optional.Optional[NodeIdFilter]     `json:"nodeIdFilter,omitzero"`
@@ -1298,11 +1188,7 @@ type NodeDetails struct {
 	Spot               optional.Optional[bool]          `json:"spot,omitzero"`
 }
 
-// NodeRunCommandAction must be created with NewNodeRunCommandAction, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type NodeRunCommandAction struct {
-	Type         string                          `json:"action"`
 	Path         string                          `json:"path"`
 	Arguments    []string                        `json:"arguments,omitempty"`
 	Environment  map[string]string               `json:"environment,omitempty"`
@@ -1336,32 +1222,20 @@ type NodeWorkerTarget struct {
 	CustomTargetCommand optional.Optional[string]  `json:"customTargetCommand,omitzero"`
 }
 
-// NodeWriteFileAction must be created with NewNodeWriteFileAction, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type NodeWriteFileAction struct {
-	Type         string                          `json:"action"`
 	Path         string                          `json:"path"`
 	Content      optional.Optional[string]       `json:"content,omitzero"`
 	NodeIdFilter optional.Optional[NodeIdFilter] `json:"nodeIdFilter,omitzero"`
 	NodeTypes    []string                        `json:"nodeTypes,omitempty"`
 }
 
-// NumericAttributeConstraint must be created with NewNumericAttributeConstraint, which sets the
-// type discriminator the platform uses to resolve the subtype. A bare struct literal leaves it
-// empty and the request is rejected.
 type NumericAttributeConstraint struct {
-	Type      string                     `json:"type"`
 	Attribute string                     `json:"attribute"`
 	Min       optional.Optional[float64] `json:"min,omitzero"`
 	Max       optional.Optional[float64] `json:"max,omitzero"`
 }
 
-// NumericAttributeDefinition must be created with NewNumericAttributeDefinition, which sets the
-// type discriminator the platform uses to resolve the subtype. A bare struct literal leaves it
-// empty and the request is rejected.
 type NumericAttributeDefinition struct {
-	Type             string                                   `json:"type"`
 	Name             string                                   `json:"name"`
 	Title            string                                   `json:"title"`
 	DefaultRankOrder NumericAttributeRankOrder                `json:"defaultRankOrder"`
@@ -1373,11 +1247,7 @@ type NumericAttributeDefinition struct {
 
 func (n *NumericAttributeDefinition) GetName() string { return n.Name }
 
-// NumericAttributePreference must be created with NewNumericAttributePreference, which sets the
-// type discriminator the platform uses to resolve the subtype. A bare struct literal leaves it
-// empty and the request is rejected.
 type NumericAttributePreference struct {
-	Type      string                                       `json:"type"`
 	Attribute string                                       `json:"attribute"`
 	Weight    float64                                      `json:"weight" yd:"default=1"`
 	RankOrder optional.Optional[NumericAttributeRankOrder] `json:"rankOrder,omitzero"`
@@ -1388,24 +1258,16 @@ type NumericAttributeRange struct {
 	Max optional.Optional[float64] `json:"max,omitzero"`
 }
 
-// NumericAttributeValue must be created with NewNumericAttributeValue, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type NumericAttributeValue struct {
-	Type      string  `json:"type"`
 	Attribute string  `json:"attribute"`
 	Value     float64 `json:"value"`
 }
 
 // Extends Instance to add fields specific to the OCI compute sources.
-//
-// OciInstance must be created with NewOciInstance, which sets the type discriminator the platform
-// uses to resolve the subtype. A bare struct literal leaves it empty and the request is rejected.
 type OciInstance struct {
-	Type              string                            `json:"type"`
 	CompartmentId     optional.Optional[string]         `json:"compartmentId,omitzero"`
-	FlexOcpus         optional.Optional[float64]        `json:"flexOcpus,omitzero"`
-	FlexRam           optional.Optional[float64]        `json:"flexRam,omitzero"`
+	FlexOcpus         optional.Optional[float32]        `json:"flexOcpus,omitzero"`
+	FlexRam           optional.Optional[float32]        `json:"flexRam,omitzero"`
 	Id                optional.Optional[InstanceId]     `json:"id,omitzero"`
 	CreatedTime       optional.Optional[time.Time]      `json:"createdTime,omitzero"`
 	Provider          optional.Optional[CloudProvider]  `json:"provider,omitzero"`
@@ -1419,18 +1281,14 @@ type OciInstance struct {
 	Spot              bool                              `json:"spot"`
 	Status            optional.Optional[InstanceStatus] `json:"status,omitzero"`
 	StatusChangedTime optional.Optional[time.Time]      `json:"statusChangedTime,omitzero"`
+	NextStatus        optional.Optional[InstanceStatus] `json:"nextStatus,omitzero"`
 }
 
 func (o *OciInstance) GetId() InstanceId { v, _ := o.Id.Get(); return v }
 
 // Defines a source of compute composed of OCI instances provisioned using the OCI Instance Pool
 // API.
-//
-// OciInstancePoolComputeSource must be created with NewOciInstancePoolComputeSource, which sets the
-// type discriminator the platform uses to resolve the subtype. A bare struct literal leaves it
-// empty and the request is rejected.
 type OciInstancePoolComputeSource struct {
-	Type                      string                                     `json:"type"`
 	Traits                    optional.Optional[ComputeSourceTraits]     `json:"traits,omitzero"`
 	InstancePricing           optional.Optional[InstancePricing]         `json:"instancePricing,omitzero"`
 	Id                        optional.Optional[string]                  `json:"id,omitzero" yd:"systemGenerated"`
@@ -1443,8 +1301,8 @@ type OciInstancePoolComputeSource struct {
 	CompartmentId             string                                     `json:"compartmentId"`
 	ImageId                   string                                     `json:"imageId"`
 	Shape                     string                                     `json:"shape"`
-	FlexOcpus                 optional.Optional[float64]                 `json:"flexOcpus,omitzero"`
-	FlexRam                   optional.Optional[float64]                 `json:"flexRam,omitzero"`
+	FlexOcpus                 optional.Optional[float32]                 `json:"flexOcpus,omitzero"`
+	FlexRam                   optional.Optional[float32]                 `json:"flexRam,omitzero"`
 	SubnetId                  string                                     `json:"subnetId"`
 	Limit                     int                                        `json:"limit"`
 	AssignPublicIp            bool                                       `json:"assignPublicIp"`
@@ -1464,12 +1322,7 @@ func (o *OciInstancePoolComputeSource) GetId() string   { v, _ := o.Id.Get(); re
 func (o *OciInstancePoolComputeSource) GetName() string { return o.Name }
 
 // Defines a source of compute composed of OCI instances provisioned individually.
-//
-// OciInstancesComputeSource must be created with NewOciInstancesComputeSource, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type OciInstancesComputeSource struct {
-	Type                      string                                     `json:"type"`
 	Traits                    optional.Optional[ComputeSourceTraits]     `json:"traits,omitzero"`
 	InstancePricing           optional.Optional[InstancePricing]         `json:"instancePricing,omitzero"`
 	SupportingResourceCreated optional.Optional[bool]                    `json:"supportingResourceCreated,omitzero"`
@@ -1483,8 +1336,8 @@ type OciInstancesComputeSource struct {
 	CompartmentId             string                                     `json:"compartmentId"`
 	ImageId                   string                                     `json:"imageId"`
 	Shape                     string                                     `json:"shape"`
-	FlexOcpus                 optional.Optional[float64]                 `json:"flexOcpus,omitzero"`
-	FlexRam                   optional.Optional[float64]                 `json:"flexRam,omitzero"`
+	FlexOcpus                 optional.Optional[float32]                 `json:"flexOcpus,omitzero"`
+	FlexRam                   optional.Optional[float32]                 `json:"flexRam,omitzero"`
 	Preemptible               bool                                       `json:"preemptible"`
 	SubnetId                  string                                     `json:"subnetId"`
 	Limit                     int                                        `json:"limit"`
@@ -1523,11 +1376,7 @@ type ProviderRegionNodeSummary struct {
 	WorkingNodes optional.Optional[int64]  `json:"workingNodes,omitzero"`
 }
 
-// ProvisionedWorkerPool must be created with NewProvisionedWorkerPool, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type ProvisionedWorkerPool struct {
-	Type                 string                                             `json:"type"`
 	Id                   optional.Optional[string]                          `json:"id,omitzero" yd:"systemGenerated"`
 	Name                 optional.Optional[string]                          `json:"name,omitzero"`
 	Namespace            optional.Optional[string]                          `json:"namespace,omitzero"`
@@ -1560,11 +1409,7 @@ type ProvisionedWorkerPoolProperties struct {
 	MetricsEnabled    optional.Optional[bool]                        `json:"metricsEnabled,omitzero"`
 }
 
-// RequirementAllowance must be created with NewRequirementAllowance, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type RequirementAllowance struct {
-	Type                  string                       `json:"type"`
 	RequirementId         string                       `json:"requirementId"`
 	Id                    optional.Optional[string]    `json:"id,omitzero" yd:"systemGenerated"`
 	Description           optional.Optional[string]    `json:"description,omitzero"`
@@ -1583,11 +1428,7 @@ type RequirementAllowance struct {
 
 func (r *RequirementAllowance) GetId() string { v, _ := r.Id.Get(); return v }
 
-// RequirementsAllowance must be created with NewRequirementsAllowance, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type RequirementsAllowance struct {
-	Type                     string                       `json:"type"`
 	RequirementCreatedFromId optional.Optional[string]    `json:"requirementCreatedFromId,omitzero"`
 	RequirementCreatedById   optional.Optional[string]    `json:"requirementCreatedById,omitzero"`
 	Namespace                optional.Optional[string]    `json:"namespace,omitzero"`
@@ -1609,7 +1450,10 @@ type RequirementsAllowance struct {
 
 func (r *RequirementsAllowance) GetId() string { v, _ := r.Id.Get(); return v }
 
-// A destination to which TaskStatusFailed tasks can be resubmitted.
+// A destination to which tasks that fail can be resubmitted. A resubmitted task is set to
+// TaskStatusResubmitted instead of TaskStatusFailed, and a copy of it is added to the destination
+// TaskGroup. If the destination TaskGroup does not exist in the same WorkRequirement, or is no
+// longer able to accept tasks, the task is then set to TaskStatusFailed.
 type ResubmissionDestination struct {
 	DestinationTaskGroup string                                          `json:"destinationTaskGroup"`
 	ResubmitErrors       optional.Optional[Selection[TaskErrorSelector]] `json:"resubmitErrors,omitzero"`
@@ -1664,12 +1508,16 @@ type RunSpecification struct {
 	FailurePolicy             optional.Optional[FailurePolicy]             `json:"failurePolicy,omitzero"`
 }
 
-// A selection of elements defined by an includes list, an excludes list, or both. The matching
-// semantics are as follows: Include only the selection matches any element that appears in
-// Includes. Exclude only the selection matches any element that does not appear in Excludes. Both
-// specified Includes takes precedence; the effective set is the Includes list with any elements
-// also present in Excludes removed. Only elements that survive this filtering are matched. Neither
-// specified both lists are empty; the selection matches nothing.
+// A selection of elements defined by an includes list, an excludes list, or both.
+//
+// The matching semantics are as follows:
+//
+//   - Include only the selection matches any element that appears in Includes.
+//   - Exclude only the selection matches any element that does not appear in Excludes.
+//   - Both specified Includes takes precedence; the effective set is the Includes list with any
+//     elements also present in Excludes removed. Only elements that survive this filtering are
+//     matched.
+//   - Neither specified both lists are empty; the selection is invalid.
 type Selection[T any] struct {
 	Includes []T `json:"includes,omitempty"`
 	Excludes []T `json:"excludes,omitempty"`
@@ -1692,12 +1540,7 @@ type ServicesSchema struct {
 }
 
 // Defines a simulated source of compute that can be used to test the YellowDog Compute system.
-//
-// SimulatorComputeSource must be created with NewSimulatorComputeSource, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type SimulatorComputeSource struct {
-	Type                                     string                                     `json:"type"`
 	Traits                                   optional.Optional[ComputeSourceTraits]     `json:"traits,omitzero"`
 	Provider                                 optional.Optional[CloudProvider]           `json:"provider,omitzero"`
 	InstancePricing                          optional.Optional[InstancePricing]         `json:"instancePricing,omitzero"`
@@ -1733,12 +1576,7 @@ func (s *SimulatorComputeSource) GetId() string   { v, _ := s.Id.Get(); return v
 func (s *SimulatorComputeSource) GetName() string { return s.Name }
 
 // Extends Instance to add fields specific to the Simulator compute source.
-//
-// SimulatorInstance must be created with NewSimulatorInstance, which sets the type discriminator
-// the platform uses to resolve the subtype. A bare struct literal leaves it empty and the request
-// is rejected.
 type SimulatorInstance struct {
-	Type              string                            `json:"type"`
 	Id                optional.Optional[InstanceId]     `json:"id,omitzero"`
 	CreatedTime       optional.Optional[time.Time]      `json:"createdTime,omitzero"`
 	Provider          optional.Optional[CloudProvider]  `json:"provider,omitzero"`
@@ -1752,17 +1590,13 @@ type SimulatorInstance struct {
 	Spot              bool                              `json:"spot"`
 	Status            optional.Optional[InstanceStatus] `json:"status,omitzero"`
 	StatusChangedTime optional.Optional[time.Time]      `json:"statusChangedTime,omitzero"`
+	NextStatus        optional.Optional[InstanceStatus] `json:"nextStatus,omitzero"`
 }
 
 func (s *SimulatorInstance) GetId() InstanceId { v, _ := s.Id.Get(); return v }
 
 // Instructs YellowDog Compute to use a single compute source for the compute requirement.
-//
-// SingleSourceProvisionStrategy must be created with NewSingleSourceProvisionStrategy, which sets
-// the type discriminator the platform uses to resolve the subtype. A bare struct literal leaves it
-// empty and the request is rejected.
 type SingleSourceProvisionStrategy struct {
-	Type    string          `json:"type"`
 	Sources []ComputeSource `json:"sources"`
 }
 
@@ -1793,11 +1627,7 @@ func (s *SingleSourceProvisionStrategy) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SourceAllowance must be created with NewSourceAllowance, which sets the type discriminator the
-// platform uses to resolve the subtype. A bare struct literal leaves it empty and the request is
-// rejected.
 type SourceAllowance struct {
-	Type                  string                       `json:"type"`
 	SourceId              string                       `json:"sourceId"`
 	Id                    optional.Optional[string]    `json:"id,omitzero" yd:"systemGenerated"`
 	Description           optional.Optional[string]    `json:"description,omitzero"`
@@ -1816,11 +1646,7 @@ type SourceAllowance struct {
 
 func (s *SourceAllowance) GetId() string { v, _ := s.Id.Get(); return v }
 
-// SourcesAllowance must be created with NewSourcesAllowance, which sets the type discriminator the
-// platform uses to resolve the subtype. A bare struct literal leaves it empty and the request is
-// rejected.
 type SourcesAllowance struct {
-	Type                  string                           `json:"type"`
 	SourceCreatedFromId   optional.Optional[string]        `json:"sourceCreatedFromId,omitzero"`
 	Provider              optional.Optional[CloudProvider] `json:"provider,omitzero"`
 	Regions               []string                         `json:"regions,omitempty"`
@@ -1845,12 +1671,7 @@ func (s *SourcesAllowance) GetId() string { v, _ := s.Id.Get(); return v }
 
 // Instructs YellowDog Compute to split the provision of instances as evenly as possible across the
 // compute sources.
-//
-// SplitProvisionStrategy must be created with NewSplitProvisionStrategy, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type SplitProvisionStrategy struct {
-	Type    string          `json:"type"`
 	Sources []ComputeSource `json:"sources"`
 }
 
@@ -1881,22 +1702,14 @@ func (s *SplitProvisionStrategy) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// StringAttributeConstraint must be created with NewStringAttributeConstraint, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type StringAttributeConstraint struct {
-	Type      string                    `json:"type"`
 	Attribute string                    `json:"attribute"`
 	AnyOf     []string                  `json:"anyOf,omitempty"`
 	NoneOf    []string                  `json:"noneOf,omitempty"`
 	Pattern   optional.Optional[string] `json:"pattern,omitzero"`
 }
 
-// StringAttributeDefinition must be created with NewStringAttributeDefinition, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type StringAttributeDefinition struct {
-	Type        string                    `json:"type"`
 	Name        string                    `json:"name"`
 	Title       string                    `json:"title"`
 	Description optional.Optional[string] `json:"description,omitzero"`
@@ -1905,22 +1718,14 @@ type StringAttributeDefinition struct {
 
 func (s *StringAttributeDefinition) GetName() string { return s.Name }
 
-// StringAttributePreference must be created with NewStringAttributePreference, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type StringAttributePreference struct {
-	Type              string   `json:"type"`
 	Attribute         string   `json:"attribute"`
 	Weight            float64  `json:"weight" yd:"default=1"`
 	PreferredValues   []string `json:"preferredValues,omitempty"`
 	PreferredPatterns []string `json:"preferredPatterns,omitempty"`
 }
 
-// StringAttributeValue must be created with NewStringAttributeValue, which sets the type
-// discriminator the platform uses to resolve the subtype. A bare struct literal leaves it empty and
-// the request is rejected.
 type StringAttributeValue struct {
-	Type      string                    `json:"type"`
 	Attribute string                    `json:"attribute"`
 	Value     optional.Optional[string] `json:"value,omitzero"`
 }
@@ -2042,12 +1847,7 @@ type Track struct {
 
 // Instructs YellowDog Compute to provision instances by acquiring the maximum available from each
 // compute source in order, until the required number of instances is reached.
-//
-// WaterfallProvisionStrategy must be created with NewWaterfallProvisionStrategy, which sets the
-// type discriminator the platform uses to resolve the subtype. A bare struct literal leaves it
-// empty and the request is rejected.
 type WaterfallProvisionStrategy struct {
-	Type    string          `json:"type"`
 	Sources []ComputeSource `json:"sources"`
 }
 
@@ -2079,6 +1879,7 @@ func (w *WaterfallProvisionStrategy) UnmarshalJSON(data []byte) error {
 }
 
 // Defines the requirement for work to be done with specifications on how it should be executed.
+//
 // This class is the main model object within the YellowDog Scheduler API. It is passed between the
 // service and clients in order to request work to be done and to monitor the state of that work.
 type WorkRequirement struct {

@@ -141,38 +141,19 @@ func TestWorkRequirementJSONRoundTrip(t *testing.T) {
 // survives a marshal -> UnmarshalComputeSource round trip through its
 // polymorphic discriminator.
 func TestComputeSourceRoundTrip(t *testing.T) {
-	awsInstances := NewAwsInstancesComputeSource()
-	awsInstances.Name = "aws-src"
-	awsFleet := NewAwsFleetComputeSource()
-	awsFleet.Name = "aws-fleet-src"
-	azureInstances := NewAzureInstancesComputeSource()
-	azureInstances.Name = "azure-src"
-	azureScaleSet := NewAzureScaleSetComputeSource()
-	azureScaleSet.Name = "azure-scaleset-src"
-	gceInstances := NewGceInstancesComputeSource()
-	gceInstances.Name = "gce-src"
-	gceInstanceGroup := NewGceInstanceGroupComputeSource()
-	gceInstanceGroup.Name = "gce-group-src"
-	ociInstances := NewOciInstancesComputeSource()
-	ociInstances.Name = "oci-src"
-	ociInstancePool := NewOciInstancePoolComputeSource()
-	ociInstancePool.Name = "oci-pool-src"
-	simulator := NewSimulatorComputeSource()
-	simulator.Name = "sim-src"
-
 	cases := []struct {
 		name   string
 		source ComputeSource
 	}{
-		{"AwsInstances", awsInstances},
-		{"AwsFleet", awsFleet},
-		{"AzureInstances", azureInstances},
-		{"AzureScaleSet", azureScaleSet},
-		{"GceInstances", gceInstances},
-		{"GceInstanceGroup", gceInstanceGroup},
-		{"OciInstances", ociInstances},
-		{"OciInstancePool", ociInstancePool},
-		{"Simulator", simulator},
+		{"AwsInstances", &AwsInstancesComputeSource{Name: "aws-src"}},
+		{"AwsFleet", &AwsFleetComputeSource{Name: "aws-fleet-src"}},
+		{"AzureInstances", &AzureInstancesComputeSource{Name: "azure-src"}},
+		{"AzureScaleSet", &AzureScaleSetComputeSource{Name: "azure-scaleset-src"}},
+		{"GceInstances", &GceInstancesComputeSource{Name: "gce-src"}},
+		{"GceInstanceGroup", &GceInstanceGroupComputeSource{Name: "gce-group-src"}},
+		{"OciInstances", &OciInstancesComputeSource{Name: "oci-src"}},
+		{"OciInstancePool", &OciInstancePoolComputeSource{Name: "oci-pool-src"}},
+		{"Simulator", &SimulatorComputeSource{Name: "sim-src"}},
 	}
 
 	for _, c := range cases {
@@ -189,9 +170,6 @@ func TestComputeSourceRoundTrip(t *testing.T) {
 
 			if reflect.TypeOf(decoded) != reflect.TypeOf(c.source) {
 				t.Errorf("got type %T, want %T", decoded, c.source)
-			}
-			if discriminatorOf(decoded) != discriminatorOf(c.source) {
-				t.Errorf("discriminator mismatch: got %q, want %q", discriminatorOf(decoded), discriminatorOf(c.source))
 			}
 			if decoded.GetName() != c.source.GetName() {
 				t.Errorf("name mismatch: got %q, want %q", decoded.GetName(), c.source.GetName())
@@ -210,11 +188,11 @@ func TestInstanceRoundTrip(t *testing.T) {
 		name     string
 		instance Instance
 	}{
-		{"Simulator", &SimulatorInstance{Type: "co.yellowdog.platform.model.SimulatorInstance", Id: optional.Of(id)}},
-		{"Aws", &AwsInstance{Type: "co.yellowdog.platform.model.AwsInstance", Id: optional.Of(id)}},
-		{"Azure", &AzureInstance{Type: "co.yellowdog.platform.model.AzureInstance", Id: optional.Of(id)}},
-		{"Gce", &GceInstance{Type: "co.yellowdog.platform.model.GceInstance", Id: optional.Of(id)}},
-		{"Oci", &OciInstance{Type: "co.yellowdog.platform.model.OciInstance", Id: optional.Of(id)}},
+		{"Simulator", &SimulatorInstance{Id: optional.Of(id)}},
+		{"Aws", &AwsInstance{Id: optional.Of(id)}},
+		{"Azure", &AzureInstance{Id: optional.Of(id)}},
+		{"Gce", &GceInstance{Id: optional.Of(id)}},
+		{"Oci", &OciInstance{Id: optional.Of(id)}},
 	}
 
 	for _, c := range cases {
@@ -232,9 +210,6 @@ func TestInstanceRoundTrip(t *testing.T) {
 			if reflect.TypeOf(decoded) != reflect.TypeOf(c.instance) {
 				t.Errorf("got type %T, want %T", decoded, c.instance)
 			}
-			if discriminatorOf(decoded) != discriminatorOf(c.instance) {
-				t.Errorf("discriminator mismatch: got %q, want %q", discriminatorOf(decoded), discriminatorOf(c.instance))
-			}
 			if decoded.GetId() != id {
 				t.Errorf("id mismatch: got %+v, want %+v", decoded.GetId(), id)
 			}
@@ -242,8 +217,18 @@ func TestInstanceRoundTrip(t *testing.T) {
 	}
 }
 
-// discriminatorOf reads the Type field a polymorphic struct carries its discriminator in, which
-// is what is written to and read back from the JSON.
-func discriminatorOf(model any) string {
-	return reflect.ValueOf(model).Elem().FieldByName("Type").String()
+// A nil polymorphic field marshals as null, which has to read back as nil rather than fail for
+// want of a discriminator.
+func TestNilPolymorphicFieldRoundTrip(t *testing.T) {
+	for _, value := range []any{&Cluster{}, &ClusterSpec{}, &ComputeRequirement{}, &ComputeSourceTemplate{}} {
+		t.Run(reflect.TypeOf(value).Elem().Name(), func(t *testing.T) {
+			data, err := json.Marshal(value)
+			if err != nil {
+				t.Fatalf("marshal: %v", err)
+			}
+			if err := json.Unmarshal(data, value); err != nil {
+				t.Errorf("unmarshal %s: %v", data, err)
+			}
+		})
+	}
 }

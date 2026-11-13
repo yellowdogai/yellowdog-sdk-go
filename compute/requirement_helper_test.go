@@ -32,11 +32,9 @@ func newTestComputeClient(t *testing.T, handler http.HandlerFunc) *ComputeClient
 
 func computeRequirementWith(id string, status model.ComputeRequirementStatus) *model.ComputeRequirement {
 	return &model.ComputeRequirement{
-		Id:     optional.Of(id),
-		Status: optional.Of(status),
-		ProvisionStrategy: &model.SingleSourceProvisionStrategy{
-			Type: "co.yellowdog.platform.model.SingleSourceProvisionStrategy",
-		},
+		Id:                optional.Of(id),
+		Status:            optional.Of(status),
+		ProvisionStrategy: &model.SingleSourceProvisionStrategy{},
 	}
 }
 

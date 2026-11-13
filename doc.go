@@ -80,7 +80,7 @@
 //   - [github.com/yellowdogai/yellowdog-sdk-go/images] — machine image families, groups and images
 //   - [github.com/yellowdogai/yellowdog-sdk-go/usage] — allowances and usage tracking
 //   - [github.com/yellowdogai/yellowdog-sdk-go/cloudinfo] — cloud provider regions, instance types and pricing
-//   - [github.com/yellowdogai/yellowdog-sdk-go/model] — shared domain types, enums and constructors
+//   - [github.com/yellowdogai/yellowdog-sdk-go/model] — shared domain types and enums
 //   - [github.com/yellowdogai/yellowdog-sdk-go/optional] — Optional[T], used for every nullable field
 //   - [github.com/yellowdogai/yellowdog-sdk-go/pagination] — page references for search results
 package yellowdog

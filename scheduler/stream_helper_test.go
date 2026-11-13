@@ -154,7 +154,6 @@ func TestWorkerPoolHelper_StreamsWithoutPollingAndHonoursFinalised(t *testing.T)
 		defer cancel()
 
 		pool := &model.ConfiguredWorkerPool{
-			Type:   "co.yellowdog.platform.model.ConfiguredWorkerPool",
 			Id:     optional.Of("pool-1"),
 			Status: optional.Of(model.WorkerPoolStatus("PENDING")),
 		}
@@ -186,7 +185,6 @@ func TestWorkerPoolHelper_StreamsWithoutPollingAndHonoursFinalised(t *testing.T)
 		defer cancel()
 
 		pool := &model.ConfiguredWorkerPool{
-			Type:   "co.yellowdog.platform.model.ConfiguredWorkerPool",
 			Id:     optional.Of("pool-1"),
 			Status: optional.Of(model.WorkerPoolStatus("PENDING")),
 		}

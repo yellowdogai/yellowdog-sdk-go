@@ -33,7 +33,7 @@ func ExampleKeyringClient() {
 	log.Printf("Created keyring: %s\n", keyring.Name.Or(""))
 
 	// Add an AWS credential to the keyring using the object overload
-	awsCred := model.NewAwsCredential()
+	awsCred := &model.AwsCredential{}
 	awsCred.Name = "my-aws-cred"
 	awsCred.AccessKeyId = "AKIAIOSFODNN7EXAMPLE"
 	awsCred.SecretAccessKey = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"

@@ -259,8 +259,9 @@ const (
 	ClusterStatusTerminated   ClusterStatus = "TERMINATED"
 )
 
-// Describes the status of a compute requirement. The status of a compute requirement provides an
-// aggregated view of the statuses of instances provisioned for that requirement.
+// Describes the status of a compute requirement.
+// The status of a compute requirement provides an aggregated view of the statuses of instances
+// provisioned for that requirement.
 type ComputeRequirementStatus string
 
 const (
@@ -282,8 +283,9 @@ const (
 	ComputeSourceExhaustionStatusTermination                ComputeSourceExhaustionStatus = "TERMINATION"
 )
 
-// Describes the status of a compute source. The status of a compute source indicates if there are
-// active instances from that source, or if the source is currently being changed or has errored.
+// Describes the status of a compute source.
+// The status of a compute source indicates if there are active instances from that source, or if
+// the source is currently being changed or has errored.
 type ComputeSourceStatus string
 
 const (
@@ -374,11 +376,13 @@ func (v InstancePricing) DisplayName() string {
 }
 
 // The preferred InstancePricing when running a TaskGroup. This affects upscaling and claiming.
+//
 // OnDemandOnly and SpotOnly are restrictive. They prevent using compute that is not On-Demand and
 // Spot respectively. These restrictions apply differently in upscaling and claiming. When
 // upscaling, the restriction applies to the WorkerPool as a whole — a pool mixing Spot and
 // On-Demand sources is not eligible. When claiming, the restriction applies per Worker — a worker
 // in a mixed pool is still eligible if it individually satisfies the pricing requirement.
+//
 // OnDemandThenSpot and SpotThenOnDemand alter the priority of WorkerPools when upscaling, and of
 // Workers when claiming.
 type InstancePricingPreference string
@@ -657,8 +661,9 @@ const (
 	PermissionScopeNamespacedOrGlobal PermissionScope = "NAMESPACED_OR_GLOBAL"
 )
 
-// Describes the status of a task group. The status of the task group provides an aggregated view of
-// the statuses of tasks within the task group.
+// Describes the status of a task group.
+// The status of the task group provides an aggregated view of the statuses of tasks within the task
+// group.
 type TaskGroupStatus string
 
 const (
@@ -750,8 +755,9 @@ func (v TaskStatus) Finished() bool {
 	return false
 }
 
-// Describes the status of a work requirement. The status of a work requirement provides an
-// aggregated view of the statuses of the task groups within that requirement.
+// Describes the status of a work requirement.
+// The status of a work requirement provides an aggregated view of the statuses of the task groups
+// within that requirement.
 type WorkRequirementStatus string
 
 const (
@@ -797,8 +803,9 @@ const (
 	WorkerPoolStatusTerminated  WorkerPoolStatus = "TERMINATED"
 )
 
-// Available returns true, if the status indicates the pool is currently available (i.e. workers can
-// register, be claimed and do work); otherwise, false.
+// Available returns true, if the status indicates the pool is currently available (i.e. its workers
+// can be claimed); otherwise, false. Nodes can register with the pool in any status until the pool
+// has finished.
 func (v WorkerPoolStatus) Available() bool {
 	switch v {
 	case WorkerPoolStatusPending, WorkerPoolStatusEmpty, WorkerPoolStatusIdle, WorkerPoolStatusRunning:

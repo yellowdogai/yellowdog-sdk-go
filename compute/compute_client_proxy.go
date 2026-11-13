@@ -44,6 +44,19 @@ func (p *computeClientProxy) updateComputeRequirementWithReprovision(ctx context
 	return &result, nil
 }
 
+func (p *computeClientProxy) updateComputeRequirementAutoShutdown(ctx context.Context, id string) (*model.ComputeRequirement, error) {
+	return p.updateComputeRequirementAutoShutdownWithAutoShutdown(ctx, id, nil)
+}
+
+func (p *computeClientProxy) updateComputeRequirementAutoShutdownWithAutoShutdown(ctx context.Context, id string, shutdown *model.AutoShutdown) (*model.ComputeRequirement, error) {
+	var result model.ComputeRequirement
+	path := fmt.Sprintf("%s/requirements/%s/autoShutdown", computeServicePath, id)
+	if err := p.http.Put(ctx, path, shutdown, &result); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 func (p *computeClientProxy) getComputeRequirement(ctx context.Context, computeRequirement *model.ComputeRequirement) (*model.ComputeRequirement, error) {
 	return p.getComputeRequirementById(ctx, computeRequirement.Id.Or(""))
 }

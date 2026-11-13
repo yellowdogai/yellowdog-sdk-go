@@ -8,137 +8,137 @@ import "github.com/yellowdogai/yellowdog-sdk-go/internal/polymorphic"
 var CredentialRegistry = polymorphic.NewRegistry[Credential]("type")
 
 func init() {
-	CredentialRegistry.Register("co.yellowdog.platform.model.AwsAccountRoleCredential", (*AwsAccountRoleCredential)(nil))
-	CredentialRegistry.Register("co.yellowdog.platform.model.AwsCredential", (*AwsCredential)(nil))
-	CredentialRegistry.Register("co.yellowdog.platform.model.AzureClientCredential", (*AzureClientCredential)(nil))
-	CredentialRegistry.Register("co.yellowdog.platform.model.AzureInstanceCredential", (*AzureInstanceCredential)(nil))
-	CredentialRegistry.Register("co.yellowdog.platform.model.AzureStorageCredential", (*AzureStorageCredential)(nil))
-	CredentialRegistry.Register("co.yellowdog.platform.model.GoogleCloudCredential", (*GoogleCloudCredential)(nil))
-	CredentialRegistry.Register("co.yellowdog.platform.model.OciCredential", (*OciCredential)(nil))
+	CredentialRegistry.Register(awsAccountRoleCredentialDiscriminator, (*AwsAccountRoleCredential)(nil))
+	CredentialRegistry.Register(awsCredentialDiscriminator, (*AwsCredential)(nil))
+	CredentialRegistry.Register(azureClientCredentialDiscriminator, (*AzureClientCredential)(nil))
+	CredentialRegistry.Register(azureInstanceCredentialDiscriminator, (*AzureInstanceCredential)(nil))
+	CredentialRegistry.Register(azureStorageCredentialDiscriminator, (*AzureStorageCredential)(nil))
+	CredentialRegistry.Register(googleCloudCredentialDiscriminator, (*GoogleCloudCredential)(nil))
+	CredentialRegistry.Register(ociCredentialDiscriminator, (*OciCredential)(nil))
 }
 
 // AllowanceRegistry provides polymorphic unmarshaling for Allowance types.
 var AllowanceRegistry = polymorphic.NewRegistry[Allowance]("type")
 
 func init() {
-	AllowanceRegistry.Register("co.yellowdog.platform.model.AccountAllowance", (*AccountAllowance)(nil))
-	AllowanceRegistry.Register("co.yellowdog.platform.model.RequirementAllowance", (*RequirementAllowance)(nil))
-	AllowanceRegistry.Register("co.yellowdog.platform.model.RequirementsAllowance", (*RequirementsAllowance)(nil))
-	AllowanceRegistry.Register("co.yellowdog.platform.model.SourceAllowance", (*SourceAllowance)(nil))
-	AllowanceRegistry.Register("co.yellowdog.platform.model.SourcesAllowance", (*SourcesAllowance)(nil))
+	AllowanceRegistry.Register(accountAllowanceDiscriminator, (*AccountAllowance)(nil))
+	AllowanceRegistry.Register(requirementAllowanceDiscriminator, (*RequirementAllowance)(nil))
+	AllowanceRegistry.Register(requirementsAllowanceDiscriminator, (*RequirementsAllowance)(nil))
+	AllowanceRegistry.Register(sourceAllowanceDiscriminator, (*SourceAllowance)(nil))
+	AllowanceRegistry.Register(sourcesAllowanceDiscriminator, (*SourcesAllowance)(nil))
 }
 
 // AttributeConstraintRegistry provides polymorphic unmarshaling for AttributeConstraint types.
 var AttributeConstraintRegistry = polymorphic.NewRegistry[AttributeConstraint]("type")
 
 func init() {
-	AttributeConstraintRegistry.Register("co.yellowdog.platform.model.NumericAttributeConstraint", (*NumericAttributeConstraint)(nil))
-	AttributeConstraintRegistry.Register("co.yellowdog.platform.model.StringAttributeConstraint", (*StringAttributeConstraint)(nil))
+	AttributeConstraintRegistry.Register(numericAttributeConstraintDiscriminator, (*NumericAttributeConstraint)(nil))
+	AttributeConstraintRegistry.Register(stringAttributeConstraintDiscriminator, (*StringAttributeConstraint)(nil))
 }
 
 // AttributeDefinitionRegistry provides polymorphic unmarshaling for AttributeDefinition types.
 var AttributeDefinitionRegistry = polymorphic.NewRegistry[AttributeDefinition]("type")
 
 func init() {
-	AttributeDefinitionRegistry.Register("co.yellowdog.platform.model.NumericAttributeDefinition", (*NumericAttributeDefinition)(nil))
-	AttributeDefinitionRegistry.Register("co.yellowdog.platform.model.StringAttributeDefinition", (*StringAttributeDefinition)(nil))
+	AttributeDefinitionRegistry.Register(numericAttributeDefinitionDiscriminator, (*NumericAttributeDefinition)(nil))
+	AttributeDefinitionRegistry.Register(stringAttributeDefinitionDiscriminator, (*StringAttributeDefinition)(nil))
 }
 
 // AttributePreferenceRegistry provides polymorphic unmarshaling for AttributePreference types.
 var AttributePreferenceRegistry = polymorphic.NewRegistry[AttributePreference]("type")
 
 func init() {
-	AttributePreferenceRegistry.Register("co.yellowdog.platform.model.NumericAttributePreference", (*NumericAttributePreference)(nil))
-	AttributePreferenceRegistry.Register("co.yellowdog.platform.model.StringAttributePreference", (*StringAttributePreference)(nil))
+	AttributePreferenceRegistry.Register(numericAttributePreferenceDiscriminator, (*NumericAttributePreference)(nil))
+	AttributePreferenceRegistry.Register(stringAttributePreferenceDiscriminator, (*StringAttributePreference)(nil))
 }
 
 // AttributeValueRegistry provides polymorphic unmarshaling for AttributeValue types.
 var AttributeValueRegistry = polymorphic.NewRegistry[AttributeValue]("type")
 
 func init() {
-	AttributeValueRegistry.Register("co.yellowdog.platform.model.NumericAttributeValue", (*NumericAttributeValue)(nil))
-	AttributeValueRegistry.Register("co.yellowdog.platform.model.StringAttributeValue", (*StringAttributeValue)(nil))
+	AttributeValueRegistry.Register(numericAttributeValueDiscriminator, (*NumericAttributeValue)(nil))
+	AttributeValueRegistry.Register(stringAttributeValueDiscriminator, (*StringAttributeValue)(nil))
 }
 
 // ComputeSourceRegistry provides polymorphic unmarshaling for ComputeSource types.
 var ComputeSourceRegistry = polymorphic.NewRegistry[ComputeSource]("type")
 
 func init() {
-	ComputeSourceRegistry.Register("co.yellowdog.platform.model.AwsFleetComputeSource", (*AwsFleetComputeSource)(nil))
-	ComputeSourceRegistry.Register("co.yellowdog.platform.model.AwsInstancesComputeSource", (*AwsInstancesComputeSource)(nil))
-	ComputeSourceRegistry.Register("co.yellowdog.platform.model.AzureInstancesComputeSource", (*AzureInstancesComputeSource)(nil))
-	ComputeSourceRegistry.Register("co.yellowdog.platform.model.AzureScaleSetComputeSource", (*AzureScaleSetComputeSource)(nil))
-	ComputeSourceRegistry.Register("co.yellowdog.platform.model.GceInstanceGroupComputeSource", (*GceInstanceGroupComputeSource)(nil))
-	ComputeSourceRegistry.Register("co.yellowdog.platform.model.GceInstancesComputeSource", (*GceInstancesComputeSource)(nil))
-	ComputeSourceRegistry.Register("co.yellowdog.platform.model.OciInstancePoolComputeSource", (*OciInstancePoolComputeSource)(nil))
-	ComputeSourceRegistry.Register("co.yellowdog.platform.model.OciInstancesComputeSource", (*OciInstancesComputeSource)(nil))
-	ComputeSourceRegistry.Register("co.yellowdog.platform.model.SimulatorComputeSource", (*SimulatorComputeSource)(nil))
+	ComputeSourceRegistry.Register(awsFleetComputeSourceDiscriminator, (*AwsFleetComputeSource)(nil))
+	ComputeSourceRegistry.Register(awsInstancesComputeSourceDiscriminator, (*AwsInstancesComputeSource)(nil))
+	ComputeSourceRegistry.Register(azureInstancesComputeSourceDiscriminator, (*AzureInstancesComputeSource)(nil))
+	ComputeSourceRegistry.Register(azureScaleSetComputeSourceDiscriminator, (*AzureScaleSetComputeSource)(nil))
+	ComputeSourceRegistry.Register(gceInstanceGroupComputeSourceDiscriminator, (*GceInstanceGroupComputeSource)(nil))
+	ComputeSourceRegistry.Register(gceInstancesComputeSourceDiscriminator, (*GceInstancesComputeSource)(nil))
+	ComputeSourceRegistry.Register(ociInstancePoolComputeSourceDiscriminator, (*OciInstancePoolComputeSource)(nil))
+	ComputeSourceRegistry.Register(ociInstancesComputeSourceDiscriminator, (*OciInstancesComputeSource)(nil))
+	ComputeSourceRegistry.Register(simulatorComputeSourceDiscriminator, (*SimulatorComputeSource)(nil))
 }
 
 // InstanceRegistry provides polymorphic unmarshaling for Instance types.
 var InstanceRegistry = polymorphic.NewRegistry[Instance]("type")
 
 func init() {
-	InstanceRegistry.Register("co.yellowdog.platform.model.AwsInstance", (*AwsInstance)(nil))
-	InstanceRegistry.Register("co.yellowdog.platform.model.AzureInstance", (*AzureInstance)(nil))
-	InstanceRegistry.Register("co.yellowdog.platform.model.GceInstance", (*GceInstance)(nil))
-	InstanceRegistry.Register("co.yellowdog.platform.model.OciInstance", (*OciInstance)(nil))
-	InstanceRegistry.Register("co.yellowdog.platform.model.SimulatorInstance", (*SimulatorInstance)(nil))
+	InstanceRegistry.Register(awsInstanceDiscriminator, (*AwsInstance)(nil))
+	InstanceRegistry.Register(azureInstanceDiscriminator, (*AzureInstance)(nil))
+	InstanceRegistry.Register(gceInstanceDiscriminator, (*GceInstance)(nil))
+	InstanceRegistry.Register(ociInstanceDiscriminator, (*OciInstance)(nil))
+	InstanceRegistry.Register(simulatorInstanceDiscriminator, (*SimulatorInstance)(nil))
 }
 
 // BestComputeSourceReportConstraintRegistry provides polymorphic unmarshaling for BestComputeSourceReportConstraint types.
 var BestComputeSourceReportConstraintRegistry = polymorphic.NewRegistry[BestComputeSourceReportConstraint]("type")
 
 func init() {
-	BestComputeSourceReportConstraintRegistry.Register("co.yellowdog.platform.model.BestComputeSourceReportNumericConstraint", (*BestComputeSourceReportNumericConstraint)(nil))
-	BestComputeSourceReportConstraintRegistry.Register("co.yellowdog.platform.model.BestComputeSourceReportStringConstraint", (*BestComputeSourceReportStringConstraint)(nil))
+	BestComputeSourceReportConstraintRegistry.Register(bestComputeSourceReportNumericConstraintDiscriminator, (*BestComputeSourceReportNumericConstraint)(nil))
+	BestComputeSourceReportConstraintRegistry.Register(bestComputeSourceReportStringConstraintDiscriminator, (*BestComputeSourceReportStringConstraint)(nil))
 }
 
 // ClusterProviderRegistry provides polymorphic unmarshaling for ClusterProvider types.
 var ClusterProviderRegistry = polymorphic.NewRegistry[ClusterProvider]("type")
 
 func init() {
-	ClusterProviderRegistry.Register("co.yellowdog.platform.model.EksClusterProvider", (*EksClusterProvider)(nil))
+	ClusterProviderRegistry.Register(eksClusterProviderDiscriminator, (*EksClusterProvider)(nil))
 }
 
 // ComputeProvisionStrategyRegistry provides polymorphic unmarshaling for ComputeProvisionStrategy types.
 var ComputeProvisionStrategyRegistry = polymorphic.NewRegistry[ComputeProvisionStrategy]("type")
 
 func init() {
-	ComputeProvisionStrategyRegistry.Register("co.yellowdog.platform.model.SingleSourceProvisionStrategy", (*SingleSourceProvisionStrategy)(nil))
-	ComputeProvisionStrategyRegistry.Register("co.yellowdog.platform.model.SplitProvisionStrategy", (*SplitProvisionStrategy)(nil))
-	ComputeProvisionStrategyRegistry.Register("co.yellowdog.platform.model.WaterfallProvisionStrategy", (*WaterfallProvisionStrategy)(nil))
+	ComputeProvisionStrategyRegistry.Register(singleSourceProvisionStrategyDiscriminator, (*SingleSourceProvisionStrategy)(nil))
+	ComputeProvisionStrategyRegistry.Register(splitProvisionStrategyDiscriminator, (*SplitProvisionStrategy)(nil))
+	ComputeProvisionStrategyRegistry.Register(waterfallProvisionStrategyDiscriminator, (*WaterfallProvisionStrategy)(nil))
 }
 
 // ComputeRequirementTemplateRegistry provides polymorphic unmarshaling for ComputeRequirementTemplate types.
 var ComputeRequirementTemplateRegistry = polymorphic.NewRegistry[ComputeRequirementTemplate]("type")
 
 func init() {
-	ComputeRequirementTemplateRegistry.Register("co.yellowdog.platform.model.ComputeRequirementDynamicTemplate", (*ComputeRequirementDynamicTemplate)(nil))
-	ComputeRequirementTemplateRegistry.Register("co.yellowdog.platform.model.ComputeRequirementStaticTemplate", (*ComputeRequirementStaticTemplate)(nil))
+	ComputeRequirementTemplateRegistry.Register(computeRequirementDynamicTemplateDiscriminator, (*ComputeRequirementDynamicTemplate)(nil))
+	ComputeRequirementTemplateRegistry.Register(computeRequirementStaticTemplateDiscriminator, (*ComputeRequirementStaticTemplate)(nil))
 }
 
 // WorkerPoolRegistry provides polymorphic unmarshaling for WorkerPool types.
 var WorkerPoolRegistry = polymorphic.NewRegistry[WorkerPool]("type")
 
 func init() {
-	WorkerPoolRegistry.Register("co.yellowdog.platform.model.ConfiguredWorkerPool", (*ConfiguredWorkerPool)(nil))
-	WorkerPoolRegistry.Register("co.yellowdog.platform.model.ProvisionedWorkerPool", (*ProvisionedWorkerPool)(nil))
+	WorkerPoolRegistry.Register(configuredWorkerPoolDiscriminator, (*ConfiguredWorkerPool)(nil))
+	WorkerPoolRegistry.Register(provisionedWorkerPoolDiscriminator, (*ProvisionedWorkerPool)(nil))
 }
 
 // UserRegistry provides polymorphic unmarshaling for User types.
 var UserRegistry = polymorphic.NewRegistry[User]("type")
 
 func init() {
-	UserRegistry.Register("co.yellowdog.platform.model.ExternalUser", (*ExternalUser)(nil))
-	UserRegistry.Register("co.yellowdog.platform.model.InternalUser", (*InternalUser)(nil))
+	UserRegistry.Register(externalUserDiscriminator, (*ExternalUser)(nil))
+	UserRegistry.Register(internalUserDiscriminator, (*InternalUser)(nil))
 }
 
 // NodeActionRegistry provides polymorphic unmarshaling for NodeAction types.
 var NodeActionRegistry = polymorphic.NewRegistry[NodeAction]("action")
 
 func init() {
-	NodeActionRegistry.Register("WRITE_FILE", (*NodeWriteFileAction)(nil))
-	NodeActionRegistry.Register("CREATE_WORKERS", (*NodeCreateWorkersAction)(nil))
-	NodeActionRegistry.Register("RUN_COMMAND", (*NodeRunCommandAction)(nil))
+	NodeActionRegistry.Register(nodeWriteFileActionDiscriminator, (*NodeWriteFileAction)(nil))
+	NodeActionRegistry.Register(nodeCreateWorkersActionDiscriminator, (*NodeCreateWorkersAction)(nil))
+	NodeActionRegistry.Register(nodeRunCommandActionDiscriminator, (*NodeRunCommandAction)(nil))
 }

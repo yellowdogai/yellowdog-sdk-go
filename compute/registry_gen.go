@@ -8,6 +8,6 @@ import "github.com/yellowdogai/yellowdog-sdk-go/internal/polymorphic"
 var ComputeRequirementTemplateTestResultRegistry = polymorphic.NewRegistry[ComputeRequirementTemplateTestResult]("type")
 
 func init() {
-	ComputeRequirementTemplateTestResultRegistry.Register("co.yellowdog.platform.model.ComputeRequirementDynamicTemplateTestResult", (*ComputeRequirementDynamicTemplateTestResult)(nil))
-	ComputeRequirementTemplateTestResultRegistry.Register("co.yellowdog.platform.model.ComputeRequirementStaticTemplateTestResult", (*ComputeRequirementStaticTemplateTestResult)(nil))
+	ComputeRequirementTemplateTestResultRegistry.Register(computeRequirementDynamicTemplateTestResultDiscriminator, (*ComputeRequirementDynamicTemplateTestResult)(nil))
+	ComputeRequirementTemplateTestResultRegistry.Register(computeRequirementStaticTemplateTestResultDiscriminator, (*ComputeRequirementStaticTemplateTestResult)(nil))
 }

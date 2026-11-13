@@ -18,11 +18,7 @@ type CheckCredentialsResult struct {
 	Missing      map[string][]string                             `json:"missing,omitempty"`
 }
 
-// ComputeRequirementDynamicTemplateTestResult must be created with
-// NewComputeRequirementDynamicTemplateTestResult, which sets the type discriminator the platform
-// uses to resolve the subtype. A bare struct literal leaves it empty and the request is rejected.
 type ComputeRequirementDynamicTemplateTestResult struct {
-	Type               string                                           `json:"type"`
 	ComputeRequirement optional.Optional[model.ComputeRequirement]      `json:"computeRequirement,omitzero"`
 	Report             optional.Optional[model.BestComputeSourceReport] `json:"report,omitzero"`
 }
@@ -37,11 +33,7 @@ type ComputeRequirementSearch struct {
 	SortDirection optional.Optional[model.SortDirection] `json:"sortDirection,omitzero"`
 }
 
-// ComputeRequirementStaticTemplateTestResult must be created with
-// NewComputeRequirementStaticTemplateTestResult, which sets the type discriminator the platform
-// uses to resolve the subtype. A bare struct literal leaves it empty and the request is rejected.
 type ComputeRequirementStaticTemplateTestResult struct {
-	Type               string                                      `json:"type"`
 	ComputeRequirement optional.Optional[model.ComputeRequirement] `json:"computeRequirement,omitzero"`
 }
 
@@ -78,32 +70,30 @@ type ComputeRequirementTemplateSearch struct {
 	SortDirection optional.Optional[model.SortDirection] `json:"sortDirection,omitzero"`
 	Name          optional.Optional[string]              `json:"name,omitzero"`
 	Namespaces    []string                               `json:"namespaces,omitempty"`
-	Type          []string                               `json:"type"`
+	Type          []string                               `json:"type,omitempty"`
 	StrategyType  []string                               `json:"strategyType,omitempty"`
 }
 
-// ComputeRequirementTemplateSummary must be created with NewComputeRequirementTemplateSummary,
-// which sets the type discriminator the platform uses to resolve the subtype. A bare struct literal
-// leaves it empty and the request is rejected.
 type ComputeRequirementTemplateSummary struct {
 	Id           optional.Optional[string] `json:"id,omitzero"`
 	Name         optional.Optional[string] `json:"name,omitzero"`
 	Namespace    optional.Optional[string] `json:"namespace,omitzero"`
 	Description  optional.Optional[string] `json:"description,omitzero"`
 	StrategyType optional.Optional[string] `json:"strategyType,omitzero"`
-	Type         string                    `json:"type"`
+	Type         optional.Optional[string] `json:"type,omitzero"`
 }
 
 type ComputeRequirementTemplateUsage struct {
-	TemplateId            string                    `json:"templateId"`
-	RequirementName       string                    `json:"requirementName"`
-	RequirementNamespace  optional.Optional[string] `json:"requirementNamespace,omitzero"`
-	RequirementTag        optional.Optional[string] `json:"requirementTag,omitzero"`
-	TargetInstanceCount   int                       `json:"targetInstanceCount"`
-	ImagesId              optional.Optional[string] `json:"imagesId,omitzero"`
-	UserData              optional.Optional[string] `json:"userData,omitzero"`
-	InstanceTags          map[string]string         `json:"instanceTags,omitempty"`
-	MaintainInstanceCount bool                      `json:"maintainInstanceCount"`
+	TemplateId            string                                `json:"templateId"`
+	RequirementName       string                                `json:"requirementName"`
+	RequirementNamespace  optional.Optional[string]             `json:"requirementNamespace,omitzero"`
+	RequirementTag        optional.Optional[string]             `json:"requirementTag,omitzero"`
+	TargetInstanceCount   int                                   `json:"targetInstanceCount"`
+	ImagesId              optional.Optional[string]             `json:"imagesId,omitzero"`
+	UserData              optional.Optional[string]             `json:"userData,omitzero"`
+	InstanceTags          map[string]string                     `json:"instanceTags,omitempty"`
+	MaintainInstanceCount bool                                  `json:"maintainInstanceCount"`
+	AutoShutdown          optional.Optional[model.AutoShutdown] `json:"autoShutdown,omitzero"`
 }
 
 type ComputeRequirementsSummary struct {

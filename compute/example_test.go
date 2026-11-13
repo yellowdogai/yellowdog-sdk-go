@@ -32,7 +32,7 @@ func Example() {
 	}
 	defer func() { _ = client.Close() }()
 
-	simulatorSource := model.NewSimulatorComputeSource()
+	simulatorSource := &model.SimulatorComputeSource{}
 	simulatorSource.Name = "test-source"
 	simulatorSource.Region = "test-region"
 	simulatorSource.InstanceType = "t3.micro"
@@ -45,7 +45,7 @@ func Example() {
 		log.Fatal(err)
 	}
 
-	template := model.NewComputeRequirementStaticTemplate()
+	template := &model.ComputeRequirementStaticTemplate{}
 	template.Name = "test-template"
 	template.StrategyType = model.SingleSourceStrategyType
 	template.Sources = append(template.Sources, model.ComputeSourceUsage{
@@ -124,18 +124,18 @@ func ExampleComputeClient_GetComputeRequirements() {
 // SingleSource draws from one source; Split spreads instances across every
 // source at once; Waterfall tries them in order until one satisfies the request.
 func Example_provisionStrategies() {
-	sourceA := model.NewSimulatorComputeSource()
+	sourceA := &model.SimulatorComputeSource{}
 	sourceA.Name = "source-a"
-	sourceB := model.NewSimulatorComputeSource()
+	sourceB := &model.SimulatorComputeSource{}
 	sourceB.Name = "source-b"
 
-	singleSource := model.NewSingleSourceProvisionStrategy()
+	singleSource := &model.SingleSourceProvisionStrategy{}
 	singleSource.Sources = model.ComputeSourceList{sourceA}
 
-	split := model.NewSplitProvisionStrategy()
+	split := &model.SplitProvisionStrategy{}
 	split.Sources = model.ComputeSourceList{sourceA, sourceB}
 
-	waterfall := model.NewWaterfallProvisionStrategy()
+	waterfall := &model.WaterfallProvisionStrategy{}
 	waterfall.Sources = model.ComputeSourceList{sourceA, sourceB}
 
 	fmt.Printf("SingleSource: %d source(s)\n", len(singleSource.Sources))

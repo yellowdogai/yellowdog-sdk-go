@@ -118,14 +118,11 @@ type WorkerPoolDashboardSummary struct {
 	Errors       bool                           `json:"errors"`
 }
 
-// WorkerPoolSearch must be created with NewWorkerPoolSearch, which sets the type discriminator the
-// platform uses to resolve the subtype. A bare struct literal leaves it empty and the request is
-// rejected.
 type WorkerPoolSearch struct {
 	Namespace     optional.Optional[string]              `json:"namespace,omitzero"`
 	Namespaces    []string                               `json:"namespaces,omitempty"`
 	Name          optional.Optional[string]              `json:"name,omitzero"`
-	Type          string                                 `json:"type"`
+	Type          optional.Optional[string]              `json:"type,omitzero"`
 	Statuses      []model.WorkerPoolStatus               `json:"statuses,omitempty"`
 	CreatedTime   optional.Optional[model.InstantRange]  `json:"createdTime,omitzero"`
 	IsHealthy     optional.Optional[bool]                `json:"isHealthy,omitzero"`
@@ -134,15 +131,11 @@ type WorkerPoolSearch struct {
 }
 
 // Provides a summary of a WorkerPool including the ID that can be used to retrieve the full object.
-//
-// WorkerPoolSummary must be created with NewWorkerPoolSummary, which sets the type discriminator
-// the platform uses to resolve the subtype. A bare struct literal leaves it empty and the request
-// is rejected.
 type WorkerPoolSummary struct {
 	Id                    optional.Optional[string]                 `json:"id,omitzero"`
 	Name                  optional.Optional[string]                 `json:"name,omitzero"`
 	Namespace             optional.Optional[string]                 `json:"namespace,omitzero"`
-	Type                  string                                    `json:"type"`
+	Type                  optional.Optional[string]                 `json:"type,omitzero"`
 	RegisteredNodeCount   int                                       `json:"registeredNodeCount"`
 	RegisteredWorkerCount int                                       `json:"registeredWorkerCount"`
 	ClaimedWorkerCount    int                                       `json:"claimedWorkerCount"`

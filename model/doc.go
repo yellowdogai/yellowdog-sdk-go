@@ -9,21 +9,17 @@
 //	Field type                       How to set it
 //	string, int, []string, …         assign it — the platform requires it
 //	optional.Optional[T]             optional.Of(v)
-//	Type string on a polymorphic
-//	  struct                         the New* constructor
 //
 // So:
 //
-//	source := model.NewAwsInstancesComputeSource() // sets Type
-//	source.Name = "my-source"                      // required
-//	source.KeyName = optional.Of("my-key")         // optional
+//	source := &model.AwsInstancesComputeSource{
+//		Name:    "my-source",           // required
+//		KeyName: optional.Of("my-key"), // optional
+//	}
 //
-// Constructors exist only for the concrete types of the polymorphic interfaces
-// listed below, and only to set the "type" discriminator, which is the one field
-// a caller cannot know. No type has one for any other reason, and the types that
-// have one also carry a Validate method that the SDK calls on every outgoing
-// request body, so a struct built without its constructor is refused before the
-// request is sent rather than by the platform.
+// The concrete types of the polymorphic interfaces listed below need nothing
+// more. Each writes the discriminator the platform uses to resolve its type when
+// it is marshaled.
 //
 // # Polymorphic types
 //

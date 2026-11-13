@@ -3,11 +3,8 @@ package internal
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"io"
 	"net/http"
 	"net/http/httptest"
-	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -362,70 +359,5 @@ func TestNewHTTPClient_UsesProvidedClient(t *testing.T) {
 	client := NewHTTPClient(&HTTPConfig{BaseURL: "https://api.example.com", HTTPClient: custom})
 	if client.httpClient != custom {
 		t.Error("expected the provided *http.Client to be used as-is")
-	}
-}
-
-// validatingBody stands in for a generated polymorphic model, which implements Validate to
-// report a missing type discriminator.
-type validatingBody struct {
-	Field string `json:"field"`
-	err   error
-}
-
-func (b validatingBody) Validate() error { return b.err }
-
-func TestRequestBodyIsValidatedBeforeItIsSent(t *testing.T) {
-	var reached atomic.Bool
-	client := newTestHTTPClient(t, func(w http.ResponseWriter, r *http.Request) {
-		reached.Store(true)
-		if _, err := w.Write([]byte(`{}`)); err != nil {
-			t.Errorf("failed to write response: %v", err)
-		}
-	})
-
-	want := errors.New("model: Thing.Type is empty, use NewThing")
-	err := client.Post(context.Background(), "/things", validatingBody{err: want}, nil)
-
-	if !errors.Is(err, want) {
-		t.Fatalf("got %v, want %v", err, want)
-	}
-	if reached.Load() {
-		t.Error("the request was sent; an invalid body must not reach the platform")
-	}
-}
-
-func TestValidRequestBodyIsSent(t *testing.T) {
-	var gotBody string
-	client := newTestHTTPClient(t, func(w http.ResponseWriter, r *http.Request) {
-		b, _ := io.ReadAll(r.Body)
-		gotBody = string(b)
-		if _, err := w.Write([]byte(`{}`)); err != nil {
-			t.Errorf("failed to write response: %v", err)
-		}
-	})
-
-	if err := client.Post(context.Background(), "/things", validatingBody{Field: "v"}, nil); err != nil {
-		t.Fatalf("Post: %v", err)
-	}
-	if gotBody != `{"field":"v"}` {
-		t.Errorf("body = %s, want {\"field\":\"v\"}", gotBody)
-	}
-}
-
-// A body with no Validate method is left alone, which is every non-polymorphic request type.
-func TestRequestBodyWithoutValidateIsSent(t *testing.T) {
-	var reached atomic.Bool
-	client := newTestHTTPClient(t, func(w http.ResponseWriter, r *http.Request) {
-		reached.Store(true)
-		if _, err := w.Write([]byte(`{}`)); err != nil {
-			t.Errorf("failed to write response: %v", err)
-		}
-	})
-
-	if err := client.Post(context.Background(), "/things", map[string]string{"a": "b"}, nil); err != nil {
-		t.Fatalf("Post: %v", err)
-	}
-	if !reached.Load() {
-		t.Error("expected the request to be sent")
 	}
 }

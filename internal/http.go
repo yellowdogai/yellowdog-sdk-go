@@ -117,24 +117,9 @@ func (c *HTTPClient) DeleteWithResult(ctx context.Context, path string, result i
 	return c.doJSON(req, result)
 }
 
-// validateBody rejects a request body that reports itself as unusable. The generated
-// polymorphic models implement Validate to catch a value built as a bare struct literal:
-// it marshals without the type discriminator that identifies the subtype, and the platform
-// refuses it with a 400 carrying no message. Marshalling is the one place every outgoing
-// body passes through, so the check lives here rather than in each client method.
-func validateBody(body interface{}) error {
-	if v, ok := body.(interface{ Validate() error }); ok {
-		return v.Validate()
-	}
-	return nil
-}
-
 func (c *HTTPClient) NewRequest(ctx context.Context, method, path string, body interface{}) (*http.Request, error) {
 	var bodyReader io.Reader
 	if body != nil {
-		if err := validateBody(body); err != nil {
-			return nil, err
-		}
 		data, err := json.Marshal(body)
 		if err != nil {
 			return nil, fmt.Errorf("marshaling request body: %w", err)
@@ -157,9 +142,6 @@ func (c *HTTPClient) NewRequest(ctx context.Context, method, path string, body i
 func (c *HTTPClient) requestJSON(ctx context.Context, method, path string, body, result interface{}) error {
 	var bodyData []byte
 	if body != nil {
-		if err := validateBody(body); err != nil {
-			return err
-		}
 		var err error
 		bodyData, err = json.Marshal(body)
 		if err != nil {

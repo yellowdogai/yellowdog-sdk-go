@@ -10,14 +10,15 @@
 //
 // # Creating allowances
 //
-// Use the constructors in the model package (e.g. [model.NewAccountAllowance])
-// to build allowance values, then submit them via [AllowancesClient.AddAllowance]:
+// Build allowance values as struct literals of the model types, then submit them
+// via [AllowancesClient.AddAllowance]:
 //
-//	allowance := model.NewAccountAllowance()
-//	allowance.AllowedHours = 500
-//	allowance.ResetType = model.AllowanceResetTypeMonths
-//	allowance.LimitEnforcement = model.AllowanceLimitEnforcementSoft
-//	allowance.EffectiveFrom = time.Now()
+//	allowance := &model.AccountAllowance{
+//		AllowedHours:     500,
+//		ResetType:        model.AllowanceResetTypeMonths,
+//		LimitEnforcement: model.AllowanceLimitEnforcementSoft,
+//		EffectiveFrom:    time.Now(),
+//	}
 //	created, _ := client.Allowances.AddAllowance(ctx, allowance)
 //
 // # Polymorphic return types

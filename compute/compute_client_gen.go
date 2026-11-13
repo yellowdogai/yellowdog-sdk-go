@@ -92,15 +92,30 @@ func (c *ComputeClient) TerminateComputeRequirementById(ctx context.Context, com
 }
 
 // ReprovisionComputeRequirement instructs YellowDog Compute to provision more instances if required
-// such that the number of running instances meets the targetInstanceCount.
+// such that the number of alive instances (PENDING, RUNNING, STOPPING or STOPPED) meets the
+// targetInstanceCount.
 func (c *ComputeClient) ReprovisionComputeRequirement(ctx context.Context, computeRequirement *model.ComputeRequirement) (*model.ComputeRequirement, error) {
 	return c.proxy.reprovisionComputeRequirement(ctx, computeRequirement)
 }
 
 // ReprovisionComputeRequirementById instructs YellowDog Compute to provision more instances if
-// required such that the number of running instances meets the targetInstanceCount.
+// required such that the number of alive instances (PENDING, RUNNING, STOPPING or STOPPED) meets
+// the targetInstanceCount.
 func (c *ComputeClient) ReprovisionComputeRequirementById(ctx context.Context, computeRequirementId string) (*model.ComputeRequirement, error) {
 	return c.proxy.reprovisionComputeRequirementById(ctx, computeRequirementId)
+}
+
+// UpdateComputeRequirementAutoShutdown instructs YellowDog Compute to reset the auto shutdown
+// timeout of the specified requirement from now.
+func (c *ComputeClient) UpdateComputeRequirementAutoShutdown(ctx context.Context, computeRequirementId string) (*model.ComputeRequirement, error) {
+	return c.proxy.updateComputeRequirementAutoShutdown(ctx, computeRequirementId)
+}
+
+// UpdateComputeRequirementAutoShutdownWithAutoShutdown instructs YellowDog Compute to replace the
+// auto shutdown of the specified requirement and restart its timeout from now. If the auto shutdown
+// is disabled then the requirement will no longer be terminated automatically.
+func (c *ComputeClient) UpdateComputeRequirementAutoShutdownWithAutoShutdown(ctx context.Context, computeRequirementId string, autoShutdown *model.AutoShutdown) (*model.ComputeRequirement, error) {
+	return c.proxy.updateComputeRequirementAutoShutdownWithAutoShutdown(ctx, computeRequirementId, autoShutdown)
 }
 
 // GetInstances returns a search client for searching instances.
