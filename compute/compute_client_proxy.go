@@ -52,7 +52,7 @@ func (p *computeClientProxy) updateComputeRequirementAutoShutdownWithAutoShutdow
 	var result model.ComputeRequirement
 	path := fmt.Sprintf("%s/requirements/%s/autoShutdown", computeServicePath, id)
 	if err := p.http.Put(ctx, path, shutdown, &result); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update compute requirement auto shutdown: %w", err)
 	}
 	return &result, nil
 }

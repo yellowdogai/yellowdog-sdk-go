@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -229,15 +230,24 @@ type APIError struct {
 	StatusCode int
 	Status     string
 	Message    string
-	RequestId  string
-	Body       []byte
+	// ErrorType is the platform's exception type, e.g. InvalidRequestException.
+	ErrorType string
+	// Detail holds the specifics behind Message, such as which request values
+	// failed validation.
+	Detail    []string
+	RequestId string
+	Body      []byte
 }
 
 func (e *APIError) Error() string {
+	var suffix string
 	if e.Message != "" {
-		return fmt.Sprintf("API error %d: %s", e.StatusCode, e.Message)
+		suffix += ": " + e.Message
 	}
-	return fmt.Sprintf("API error %d: %s", e.StatusCode, e.Status)
+	if len(e.Detail) > 0 {
+		suffix += ": " + strings.Join(e.Detail, ", ")
+	}
+	return fmt.Sprintf("YellowDog API returned HTTP status %s%s", e.Status, suffix)
 }
 
 func newAPIErrorWithBody(resp *http.Response, body []byte) error {
@@ -253,8 +263,10 @@ func populateAPIError(apiErr *APIError, body []byte) error {
 	apiErr.Body = body
 
 	var errResp struct {
-		Message string `json:"message"`
-		Error   string `json:"error"`
+		Message   string          `json:"message"`
+		Error     string          `json:"error"`
+		ErrorType string          `json:"errorType"`
+		Detail    json.RawMessage `json:"detail"`
 	}
 	if json.Unmarshal(body, &errResp) == nil {
 		if errResp.Message != "" {
@@ -262,6 +274,23 @@ func populateAPIError(apiErr *APIError, body []byte) error {
 		} else if errResp.Error != "" {
 			apiErr.Message = errResp.Error
 		}
+		apiErr.ErrorType = errResp.ErrorType
+		apiErr.Detail = parseErrorDetail(errResp.Detail)
 	}
 	return apiErr
+}
+
+// parseErrorDetail reads an error's detail, which the platform sends as a list
+// of strings but which comes back as a single string from errors raised
+// outside it (RFC 9457 problem details, e.g. an unknown path).
+func parseErrorDetail(raw json.RawMessage) []string {
+	var list []string
+	if json.Unmarshal(raw, &list) == nil {
+		return list
+	}
+	var single string
+	if json.Unmarshal(raw, &single) == nil && single != "" {
+		return []string{single}
+	}
+	return nil
 }

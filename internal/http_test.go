@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"testing"
 	"time"
 )
@@ -244,6 +245,41 @@ func TestDoJSON_ErrorStatusFallsBackToErrorField(t *testing.T) {
 	}
 }
 
+func TestDoJSON_ErrorStatusCapturesErrorTypeAndDetail(t *testing.T) {
+	client := newTestHTTPClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		_, _ = w.Write([]byte(`{"detail":["name must not be blank","strategyType is invalid"],"errorType":"InvalidRequestException","message":"Request values are invalid"}`))
+	})
+
+	err := client.Get(context.Background(), "/things/1", nil)
+	apiErr, ok := err.(*APIError)
+	if !ok {
+		t.Fatalf("expected *APIError, got %T: %v", err, err)
+	}
+	if apiErr.ErrorType != "InvalidRequestException" {
+		t.Errorf("ErrorType = %q, want InvalidRequestException", apiErr.ErrorType)
+	}
+	if want := []string{"name must not be blank", "strategyType is invalid"}; !slices.Equal(apiErr.Detail, want) {
+		t.Errorf("Detail = %q, want %q", apiErr.Detail, want)
+	}
+}
+
+func TestDoJSON_ErrorStatusCapturesSingleStringDetail(t *testing.T) {
+	client := newTestHTTPClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte(`{"detail":"No static resource things/1.","status":404,"title":"Not Found"}`))
+	})
+
+	err := client.Get(context.Background(), "/things/1", nil)
+	apiErr, ok := err.(*APIError)
+	if !ok {
+		t.Fatalf("expected *APIError, got %T: %v", err, err)
+	}
+	if want := []string{"No static resource things/1."}; !slices.Equal(apiErr.Detail, want) {
+		t.Errorf("Detail = %q, want %q", apiErr.Detail, want)
+	}
+}
+
 func TestDoJSON_ErrorStatusWithNonJSONBody(t *testing.T) {
 	client := newTestHTTPClient(t, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
@@ -266,13 +302,18 @@ func TestDoJSON_ErrorStatusWithNonJSONBody(t *testing.T) {
 }
 
 func TestAPIError_ErrorString(t *testing.T) {
-	withMessage := &APIError{StatusCode: 404, Status: "404 Not Found", Message: "namespace not found"}
-	if got := withMessage.Error(); got != "API error 404: namespace not found" {
+	withMessage := &APIError{Status: "404 Not Found", Message: "namespace not found"}
+	if got := withMessage.Error(); got != "YellowDog API returned HTTP status 404 Not Found: namespace not found" {
 		t.Errorf("got %q", got)
 	}
 
-	withoutMessage := &APIError{StatusCode: 500, Status: "500 Internal Server Error"}
-	if got := withoutMessage.Error(); got != "API error 500: 500 Internal Server Error" {
+	withoutMessage := &APIError{Status: "500 Internal Server Error"}
+	if got := withoutMessage.Error(); got != "YellowDog API returned HTTP status 500 Internal Server Error" {
+		t.Errorf("got %q", got)
+	}
+
+	withDetail := &APIError{Status: "400 Bad Request", Message: "Request values are invalid", Detail: []string{"a is bad", "b is bad"}}
+	if got := withDetail.Error(); got != "YellowDog API returned HTTP status 400 Bad Request: Request values are invalid: a is bad, b is bad" {
 		t.Errorf("got %q", got)
 	}
 }
