@@ -144,4 +144,5 @@ type WorkerPoolSummary struct {
 	CreatedTime           optional.Optional[time.Time]              `json:"createdTime,omitzero"`
 	StatusChangedTime     optional.Optional[time.Time]              `json:"statusChangedTime,omitzero"`
 	Healthy               bool                                      `json:"healthy"`
+	ProvisioningPriority  float64                                   `json:"provisioningPriority"`
 }

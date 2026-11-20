@@ -1398,15 +1398,16 @@ func (p *ProvisionedWorkerPool) GetNamespace() string { v, _ := p.Namespace.Get(
 // Defines properties to determine the behaviour that the Scheduler service should use when managing
 // a provisioned worker pool.
 type ProvisionedWorkerPoolProperties struct {
-	CreateNodeWorkers optional.Optional[NodeWorkerTarget]            `json:"createNodeWorkers,omitzero"`
-	MinNodes          optional.Optional[int]                         `json:"minNodes,omitzero"`
-	MaxNodes          optional.Optional[int]                         `json:"maxNodes,omitzero"`
-	NodeBootTimeout   optional.Optional[Duration]                    `json:"nodeBootTimeout,omitzero"`
-	IdleNodeShutdown  optional.Optional[AutoShutdown]                `json:"idleNodeShutdown,omitzero"`
-	IdlePoolShutdown  optional.Optional[AutoShutdown]                `json:"idlePoolShutdown,omitzero"`
-	WorkerTag         optional.Optional[string]                      `json:"workerTag,omitzero"`
-	NodeConfiguration optional.Optional[WorkerPoolNodeConfiguration] `json:"nodeConfiguration,omitzero"`
-	MetricsEnabled    optional.Optional[bool]                        `json:"metricsEnabled,omitzero"`
+	CreateNodeWorkers    optional.Optional[NodeWorkerTarget]            `json:"createNodeWorkers,omitzero"`
+	MinNodes             optional.Optional[int]                         `json:"minNodes,omitzero"`
+	MaxNodes             optional.Optional[int]                         `json:"maxNodes,omitzero"`
+	NodeBootTimeout      optional.Optional[Duration]                    `json:"nodeBootTimeout,omitzero"`
+	IdleNodeShutdown     optional.Optional[AutoShutdown]                `json:"idleNodeShutdown,omitzero"`
+	IdlePoolShutdown     optional.Optional[AutoShutdown]                `json:"idlePoolShutdown,omitzero"`
+	WorkerTag            optional.Optional[string]                      `json:"workerTag,omitzero"`
+	ProvisioningPriority float64                                        `json:"provisioningPriority"`
+	NodeConfiguration    optional.Optional[WorkerPoolNodeConfiguration] `json:"nodeConfiguration,omitzero"`
+	MetricsEnabled       optional.Optional[bool]                        `json:"metricsEnabled,omitzero"`
 }
 
 type RequirementAllowance struct {
