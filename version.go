@@ -9,8 +9,8 @@ import (
 //go:embed VERSION
 var version string
 
-func DefaultUserAgent() string {
-	return "yd/1.0.0 yellowdog-sdk-go/" + Version() + " go/" + strings.TrimPrefix(runtime.Version(), "go")
+func baseUserAgent() string {
+	return "yd/1.1.0 yellowdog-sdk-go/" + Version() + " go/" + strings.TrimPrefix(runtime.Version(), "go")
 }
 
 func Version() string {

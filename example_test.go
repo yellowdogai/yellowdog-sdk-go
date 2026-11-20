@@ -22,7 +22,12 @@ import (
 // YELLOWDOG_API_URL is optional and targets a non-production platform. Any of
 // the three can be set on the Config directly instead.
 func Example() {
-	config := yellowdog.DefaultConfig()
+	config := yellowdog.DefaultConfig(
+		yellowdog.Product{
+			Name:    "my-app",
+			Version: "0.1.0",
+		},
+	)
 
 	client, err := yellowdog.NewClient(config)
 	if err != nil {

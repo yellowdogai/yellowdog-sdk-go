@@ -16,24 +16,26 @@ import (
 // the client unidentified.
 var platformUserAgent = regexp.MustCompile(`yd/(\d+)\.(\d+)\.(\d+) ([^ /]+)/(\d+)\.(\d+)\.(\d+) ([^ /]+)/(.+)`)
 
-func TestDefaultUserAgentMatchesThePlatformFormat(t *testing.T) {
-	match := platformUserAgent.FindStringSubmatch(DefaultUserAgent())
+func TestBaseUserAgentMatchesThePlatformFormat(t *testing.T) {
+	match := platformUserAgent.FindStringSubmatch(baseUserAgent())
 	if match == nil {
-		t.Fatalf("DefaultUserAgent() = %q, which the platform cannot parse", DefaultUserAgent())
+		t.Fatalf("BaseUserAgent() = %q, which the platform cannot parse", baseUserAgent())
 	}
 	if match[4] != "yellowdog-sdk-go" || match[8] != "go" {
-		t.Errorf("DefaultUserAgent() = %q, want application yellowdog-sdk-go and language go", DefaultUserAgent())
+		t.Errorf("BaseUserAgent() = %q, want application yellowdog-sdk-go and language go", baseUserAgent())
 	}
 }
 
 func TestRequestsSendTheUserAgent(t *testing.T) {
 	cases := []struct {
-		name      string
-		userAgent string
-		want      string
+		name     string
+		products []Product
+		want     string
 	}{
-		{"default when unset", "", DefaultUserAgent()},
-		{"configured value", "my-tool/2.0.0", "my-tool/2.0.0"},
+		{"no products", []Product{}, baseUserAgent()},
+		{"one product", []Product{{"my-tool", "2.0.0"}}, baseUserAgent() + " my-tool/2.0.0"},
+		{"multiple product", []Product{{"my-framework", "1.0.0"}, {"my-tool", "2.0.0"}}, baseUserAgent() + " my-framework/1.0.0 my-tool/2.0.0"},
+		{"product with non token chars", []Product{{" a b/c ", " v / 1"}}, baseUserAgent() + " a_b#c/v_#_1"},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -45,7 +47,7 @@ func TestRequestsSendTheUserAgent(t *testing.T) {
 			}))
 			defer server.Close()
 
-			client, err := NewClient(&Config{BaseURL: server.URL, APIKey: "key", APISecret: "secret", UserAgent: c.userAgent})
+			client, err := NewClient(&Config{BaseURL: server.URL, APIKey: "key", APISecret: "secret", UserAgentProducts: c.products})
 			if err != nil {
 				t.Fatalf("NewClient: %v", err)
 			}

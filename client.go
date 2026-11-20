@@ -40,10 +40,7 @@ func NewClient(config *Config) (*PlatformClient, error) {
 		return nil, err
 	}
 
-	userAgent := config.UserAgent
-	if userAgent == "" {
-		userAgent = DefaultUserAgent()
-	}
+	userAgent := baseUserAgent() + config.userAgentSuffix()
 
 	httpClient := internal.NewHTTPClient(&internal.HTTPConfig{
 		BaseURL:    config.BaseURL,

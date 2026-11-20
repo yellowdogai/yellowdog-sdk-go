@@ -53,19 +53,19 @@ func readVersionFileContents(t *testing.T) []byte {
 	return want
 }
 
-func TestDefaultUserAgent(t *testing.T) {
+func TestBaseUserAgent(t *testing.T) {
 
 	// Given
 	originalVersion := version
 	version = "1.2.3"
-	want := regexp.MustCompile("yd/1\\.0\\.0 yellowdog-sdk-go/1\\.2\\.3 go/\\d+\\.\\d+\\.\\d+\n")
+	want := regexp.MustCompile(`^yd/1\.1\.0 yellowdog-sdk-go/1\.2\.3 go/\d+\.\d+\.\d+$`)
 
 	// When
-	userAgent := DefaultUserAgent()
+	userAgent := baseUserAgent()
 
 	// Then
 	version = originalVersion
-	if want.MatchString(userAgent) {
-		t.Errorf(`DefaultUserAgent() = %s, want %s`, userAgent, want)
+	if !want.MatchString(userAgent) {
+		t.Errorf(`BaseUserAgent() = %s, want %s`, userAgent, want)
 	}
 }
