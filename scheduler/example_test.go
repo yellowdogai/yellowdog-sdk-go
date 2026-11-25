@@ -16,9 +16,10 @@ import (
 // Tasks are added to a task group after the requirement exists, so the requirement
 // is created first and its task group is then passed to AddTasksToTaskGroup.
 func ExampleWorkClient() {
-	config := yellowdog.DefaultConfig()
-	config.APIKey = "your-api-key"
-	config.APISecret = "your-api-secret"
+	config := yellowdog.DefaultConfig(
+		yellowdog.ServicesSchema{DefaultURL: "https://api.yellowdog.ai"},
+		yellowdog.APIKey{ID: "your-api-key-id", Secret: "your-api-key-secret"},
+	)
 
 	client, err := yellowdog.NewClient(config)
 	if err != nil {
@@ -81,9 +82,10 @@ func ExampleWorkClient() {
 // The helper streams live updates from the requirement's update endpoint, so bound
 // the wait with a context deadline: a requirement that never completes never returns.
 func ExampleWorkRequirementHelper() {
-	config := yellowdog.DefaultConfig()
-	config.APIKey = "your-api-key"
-	config.APISecret = "your-api-secret"
+	config := yellowdog.DefaultConfig(
+		yellowdog.ServicesSchema{DefaultURL: "https://api.yellowdog.ai"},
+		yellowdog.APIKey{ID: "your-api-key-id", Secret: "your-api-key-secret"},
+	)
 
 	client, err := yellowdog.NewClient(config)
 	if err != nil {
@@ -115,9 +117,10 @@ func ExampleWorkRequirementHelper() {
 // rather than being provisioned directly from a compute source. The token secret
 // returned here is the only time it is available in full.
 func ExampleWorkerPoolClient_AddConfiguredWorkerPool() {
-	config := yellowdog.DefaultConfig()
-	config.APIKey = "your-api-key"
-	config.APISecret = "your-api-secret"
+	config := yellowdog.DefaultConfig(
+		yellowdog.ServicesSchema{DefaultURL: "https://api.yellowdog.ai"},
+		yellowdog.APIKey{ID: "your-api-key-id", Secret: "your-api-key-secret"},
+	)
 
 	client, err := yellowdog.NewClient(config)
 	if err != nil {
@@ -157,9 +160,10 @@ func ExampleWorkerPoolClient_AddConfiguredWorkerPool() {
 // GetWorkerPool returns a model.WorkerPool interface; use a type assertion
 // to access fields specific to model.ConfiguredWorkerPool.
 func ExampleWorkerPoolHelper() {
-	config := yellowdog.DefaultConfig()
-	config.APIKey = "your-api-key"
-	config.APISecret = "your-api-secret"
+	config := yellowdog.DefaultConfig(
+		yellowdog.ServicesSchema{DefaultURL: "https://api.yellowdog.ai"},
+		yellowdog.APIKey{ID: "your-api-key-id", Secret: "your-api-key-secret"},
+	)
 
 	client, err := yellowdog.NewClient(config)
 	if err != nil {

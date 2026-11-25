@@ -12,17 +12,10 @@ import (
 )
 
 // Example demonstrates creating a client and reaching a service through it.
-//
-// DefaultConfig reads credentials from the environment, so set them before
-// running:
-//
-//	export YELLOWDOG_API_KEY=your-api-key
-//	export YELLOWDOG_API_SECRET=your-api-secret
-//
-// YELLOWDOG_API_URL is optional and targets a non-production platform. Any of
-// the three can be set on the Config directly instead.
 func Example() {
 	config := yellowdog.DefaultConfig(
+		yellowdog.ServicesSchema{DefaultURL: "https://api.yellowdog.ai"},
+		yellowdog.APIKey{ID: "your-api-key-id", Secret: "your-api-key-secret"},
 		yellowdog.Product{
 			Name:    "my-app",
 			Version: "0.1.0",

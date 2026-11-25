@@ -1,9 +1,9 @@
 package yellowdog
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -11,14 +11,11 @@ import (
 
 // Config holds the configuration for the YellowDog Platform Client.
 type Config struct {
-	// BaseURL is the base URL for the YellowDog API (e.g., "https://api.yellowdog.ai")
-	BaseURL string
+	// ServicesSchema locates the YellowDog Platform services
+	ServicesSchema ServicesSchema
 
-	// APIKey is the application API key
-	APIKey string
-
-	// APISecret is the application API secret
-	APISecret string
+	// APIKey authenticates the application
+	APIKey APIKey
 
 	// HTTPClient is the HTTP client to use for requests.
 	// If nil, a default client with reasonable timeouts will be used.
@@ -35,6 +32,51 @@ type Config struct {
 	// application is recommended. It lets YellowDog see which applications, and which versions of them, use the
 	// platform, so YellowDog can provide you with better support.
 	UserAgentProducts []Product
+
+	// Logger receives a debug record for every request and response, with its body. Bodies can hold secrets, such as
+	// cloud provider credentials, so don't enable debug logging in production. If nil, nothing is logged.
+	Logger *slog.Logger
+}
+
+// ServicesSchema locates the YellowDog Platform services.
+type ServicesSchema struct {
+	// DefaultURL is the base URL of the YellowDog Platform, e.g. "https://api.yellowdog.ai"
+	DefaultURL string
+}
+
+// APIKey is an application's API key, which authenticates the application with the YellowDog Platform.
+type APIKey struct {
+	// ID is the API key's ID
+	ID string
+
+	// Secret is the API key's secret
+	Secret Secret
+}
+
+// Secret is a value to keep secret, such as an API key's secret. Formatting, logging or marshalling it gives
+// [REDACTED] instead of the value, so it doesn't leak by accident. Convert it with string(s) to read the value.
+type Secret string
+
+const redacted = "[REDACTED]"
+
+// String returns [REDACTED].
+func (Secret) String() string {
+	return redacted
+}
+
+// Format writes [REDACTED] for every verb, including %#v, %x and %q.
+func (Secret) Format(f fmt.State, _ rune) {
+	_, _ = fmt.Fprint(f, redacted)
+}
+
+// MarshalText returns [REDACTED], which encoding/json and other text-based encoders use.
+func (Secret) MarshalText() ([]byte, error) {
+	return []byte(redacted), nil
+}
+
+// LogValue returns [REDACTED], so log/slog never logs the value.
+func (Secret) LogValue() slog.Value {
+	return slog.StringValue(redacted)
 }
 
 // Product identifies an application in the User-Agent header that the SDK sends. The SDK adds it after its own version
@@ -50,37 +92,27 @@ type Product struct {
 	Version string
 }
 
-// DefaultConfig returns a Config with sensible defaults.
-func DefaultConfig(products ...Product) *Config {
-	config := &Config{
-		BaseURL:           "https://api.yellowdog.ai",
+// DefaultConfig returns a Config for the given services and API key, with sensible defaults for everything else.
+func DefaultConfig(servicesSchema ServicesSchema, apiKey APIKey, products ...Product) *Config {
+	return &Config{
+		ServicesSchema:    servicesSchema,
+		APIKey:            apiKey,
 		HTTPClient:        nil,
 		Timeout:           30 * time.Second,
 		UserAgentProducts: products,
 	}
-
-	if os.Getenv("YELLOWDOG_API_URL") != "" {
-		config.BaseURL = os.Getenv("YELLOWDOG_API_URL")
-	}
-	if os.Getenv("YELLOWDOG_API_KEY") != "" {
-		config.APIKey = os.Getenv("YELLOWDOG_API_KEY")
-	}
-	if os.Getenv("YELLOWDOG_API_SECRET") != "" {
-		config.APISecret = os.Getenv("YELLOWDOG_API_SECRET")
-	}
-	return config
 }
 
 // Validate checks if the configuration is valid.
 func (c *Config) Validate() error {
-	if c.BaseURL == "" {
-		return &ConfigError{Field: "BaseURL", Message: "base URL is required"}
+	if c.ServicesSchema.DefaultURL == "" {
+		return &ConfigError{Field: "ServicesSchema.DefaultURL", Message: "default URL is required"}
 	}
-	if c.APIKey == "" {
-		return &ConfigError{Field: "APIKey", Message: "API key is required"}
+	if c.APIKey.ID == "" {
+		return &ConfigError{Field: "APIKey.ID", Message: "API key ID is required"}
 	}
-	if c.APISecret == "" {
-		return &ConfigError{Field: "APISecret", Message: "API secret is required"}
+	if c.APIKey.Secret == "" {
+		return &ConfigError{Field: "APIKey.Secret", Message: "API key secret is required"}
 	}
 	return nil
 }

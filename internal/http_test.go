@@ -1,8 +1,10 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"slices"
@@ -146,6 +148,26 @@ func TestDelete_SendsNoBody(t *testing.T) {
 
 	if err := client.Delete(context.Background(), "/things/1"); err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestDelete_IsLogged(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	t.Cleanup(server.Close)
+	var logs bytes.Buffer
+	client := NewHTTPClient(&HTTPConfig{
+		BaseURL: server.URL,
+		Logger:  slog.New(slog.NewTextHandler(&logs, &slog.HandlerOptions{Level: slog.LevelDebug})),
+	})
+
+	if err := client.Delete(context.Background(), "/things/1"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if !bytes.Contains(logs.Bytes(), []byte(`msg="HTTP request" method=DELETE`)) {
+		t.Errorf("logs do not contain the DELETE request:\n%s", logs.String())
 	}
 }
 

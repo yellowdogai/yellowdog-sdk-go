@@ -11,9 +11,10 @@ import (
 
 // ExampleKeyringClient demonstrates creating a keyring and managing credentials.
 func ExampleKeyringClient() {
-	config := yellowdog.DefaultConfig()
-	config.APIKey = "your-api-key"
-	config.APISecret = "your-api-secret"
+	config := yellowdog.DefaultConfig(
+		yellowdog.ServicesSchema{DefaultURL: "https://api.yellowdog.ai"},
+		yellowdog.APIKey{ID: "your-api-key-id", Secret: "your-api-key-secret"},
+	)
 
 	client, err := yellowdog.NewClient(config)
 	if err != nil {

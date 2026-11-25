@@ -16,16 +16,12 @@
 //
 // # Configuration
 //
-// [DefaultConfig] returns a [Config] populated from the environment:
-//
-//   - YELLOWDOG_API_KEY — application API key (required)
-//   - YELLOWDOG_API_SECRET — application API secret (required)
-//   - YELLOWDOG_API_URL — API base URL, defaulting to production (optional)
-//   - YELLOWDOG_DEBUG — set to 1 to log every request and response in full
-//
-// Every field can also be set directly, including Timeout, UserAgent and
-// HTTPClient for supplying your own *http.Client. [NewClient] validates the
-// configuration and fails if either credential is missing.
+// [DefaultConfig] returns a [Config] for the platform's URL, in a
+// [ServicesSchema], and your application's [APIKey]. Every field can also be
+// set directly, including Timeout, UserAgentProducts, HTTPClient for
+// supplying your own *http.Client, and Logger for logging every request and
+// response in full. [NewClient] validates the configuration and fails if the
+// URL or either part of the API key is missing.
 //
 // # Services
 //

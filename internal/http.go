@@ -3,13 +3,11 @@ package internal
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 )
@@ -21,6 +19,7 @@ type HTTPConfig struct {
 	HTTPClient *http.Client
 	Timeout    time.Duration
 	UserAgent  string
+	Logger     *slog.Logger
 }
 
 type HTTPClient struct {
@@ -32,17 +31,6 @@ type HTTPClient struct {
 	logger     *slog.Logger
 }
 
-// SetDebug enables or disables debug logging for all HTTP requests.
-func (c *HTTPClient) SetDebug(enabled bool) {
-	if enabled {
-		c.logger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
-			Level: slog.LevelDebug,
-		}))
-	} else {
-		c.logger = slog.New(slog.NewTextHandler(io.Discard, nil))
-	}
-}
-
 func NewHTTPClient(config *HTTPConfig) *HTTPClient {
 	client := config.HTTPClient
 	if client == nil {
@@ -52,13 +40,15 @@ func NewHTTPClient(config *HTTPConfig) *HTTPClient {
 			MaxIdleConnsPerHost: 10,
 			IdleConnTimeout:     90 * time.Second,
 		}
-		if os.Getenv("YELLOWDOG_API_INSECURE") != "" {
-			transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec
-		}
 		client = &http.Client{
 			Timeout:   config.Timeout,
 			Transport: transport,
 		}
+	}
+
+	logger := config.Logger
+	if logger == nil {
+		logger = slog.New(slog.DiscardHandler)
 	}
 
 	hc := &HTTPClient{
@@ -67,7 +57,7 @@ func NewHTTPClient(config *HTTPConfig) *HTTPClient {
 		apiSecret:  config.APISecret,
 		httpClient: client,
 		userAgent:  config.UserAgent,
-		logger:     slog.New(slog.NewTextHandler(io.Discard, nil)),
+		logger:     logger,
 	}
 	return hc
 }
@@ -84,12 +74,7 @@ func (c *HTTPClient) Get(ctx context.Context, path string, result interface{}) e
 		return fmt.Errorf("creating GET request for %s: %w", path, err)
 	}
 
-	c.logger.Debug("HTTP request",
-		slog.String("method", "GET"),
-		slog.String("url", c.baseURL+path),
-	)
-
-	return c.doJSON(req, result)
+	return c.doJSON(req, nil, result)
 }
 
 func (c *HTTPClient) Post(ctx context.Context, path string, body, result interface{}) error {
@@ -106,7 +91,7 @@ func (c *HTTPClient) Delete(ctx context.Context, path string) error {
 		return fmt.Errorf("creating DELETE request for %s: %w", path, err)
 	}
 
-	return c.doJSON(req, nil)
+	return c.doJSON(req, nil, nil)
 }
 
 func (c *HTTPClient) DeleteWithResult(ctx context.Context, path string, result interface{}) error {
@@ -115,7 +100,7 @@ func (c *HTTPClient) DeleteWithResult(ctx context.Context, path string, result i
 		return fmt.Errorf("creating DELETE request for %s: %w", path, err)
 	}
 
-	return c.doJSON(req, result)
+	return c.doJSON(req, nil, result)
 }
 
 func (c *HTTPClient) NewRequest(ctx context.Context, method, path string, body interface{}) (*http.Request, error) {
@@ -148,17 +133,6 @@ func (c *HTTPClient) requestJSON(ctx context.Context, method, path string, body,
 		if err != nil {
 			return fmt.Errorf("marshaling request body: %w", err)
 		}
-		c.logger.Debug("HTTP request",
-			slog.String("method", method),
-			slog.String("url", c.baseURL+path),
-			slog.Int("body_size", len(bodyData)),
-			slog.String("body", string(bodyData)),
-		)
-	} else {
-		c.logger.Debug("HTTP request",
-			slog.String("method", method),
-			slog.String("url", c.baseURL+path),
-		)
 	}
 
 	var bodyReader io.Reader
@@ -175,12 +149,26 @@ func (c *HTTPClient) requestJSON(ctx context.Context, method, path string, body,
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	return c.doJSON(req, result)
+	return c.doJSON(req, bodyData, result)
 }
 
 const maxResponseSizeBytes = 10 * 1024 * 1024 // 10MB
 
-func (c *HTTPClient) doJSON(req *http.Request, result any) error {
+func (c *HTTPClient) doJSON(req *http.Request, reqBody []byte, result any) error {
+	if reqBody == nil {
+		c.logger.Debug("HTTP request",
+			slog.String("method", req.Method),
+			slog.String("url", req.URL.String()),
+		)
+	} else {
+		c.logger.Debug("HTTP request",
+			slog.String("method", req.Method),
+			slog.String("url", req.URL.String()),
+			slog.Int("body_size", len(reqBody)),
+			slog.String("body", string(reqBody)),
+		)
+	}
+
 	resp, err := c.Do(req)
 	if err != nil {
 		return fmt.Errorf("executing HTTP request to %s: %w", req.URL, err)

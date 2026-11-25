@@ -22,9 +22,10 @@ import (
 func Example() {
 	ctx := context.Background()
 
-	config := yellowdog.DefaultConfig()
-	config.APIKey = "your-api-key"
-	config.APISecret = "your-api-secret"
+	config := yellowdog.DefaultConfig(
+		yellowdog.ServicesSchema{DefaultURL: "https://api.yellowdog.ai"},
+		yellowdog.APIKey{ID: "your-api-key-id", Secret: "your-api-key-secret"},
+	)
 
 	client, err := yellowdog.NewClient(config)
 	if err != nil {
@@ -97,7 +98,10 @@ func Example() {
 func ExampleComputeClient_GetComputeRequirements() {
 	ctx := context.Background()
 
-	config := yellowdog.DefaultConfig()
+	config := yellowdog.DefaultConfig(
+		yellowdog.ServicesSchema{DefaultURL: "https://api.yellowdog.ai"},
+		yellowdog.APIKey{ID: "your-api-key-id", Secret: "your-api-key-secret"},
+	)
 	client, _ := yellowdog.NewClient(config)
 	defer func() { _ = client.Close() }()
 
@@ -189,7 +193,10 @@ func ExampleComputeRequirement_SupportedOperations() {
 // function unsubscribes; the underlying connection is shared between listeners
 // on the same requirement and torn down when the last one goes away.
 func ExampleComputeClient_AddComputeRequirementListener() {
-	config := yellowdog.DefaultConfig()
+	config := yellowdog.DefaultConfig(
+		yellowdog.ServicesSchema{DefaultURL: "https://api.yellowdog.ai"},
+		yellowdog.APIKey{ID: "your-api-key-id", Secret: "your-api-key-secret"},
+	)
 	client, _ := yellowdog.NewClient(config)
 	defer func() { _ = client.Close() }()
 

@@ -1,8 +1,6 @@
 package yellowdog
 
 import (
-	"os"
-
 	"github.com/yellowdogai/yellowdog-sdk-go/account"
 	"github.com/yellowdogai/yellowdog-sdk-go/cloudinfo"
 	"github.com/yellowdogai/yellowdog-sdk-go/compute"
@@ -33,7 +31,7 @@ type PlatformClient struct {
 // NewClient creates a new YellowDog Platform Client.
 func NewClient(config *Config) (*PlatformClient, error) {
 	if config == nil {
-		config = DefaultConfig()
+		return nil, &ConfigError{Field: "Config", Message: "config is required"}
 	}
 
 	if err := config.Validate(); err != nil {
@@ -43,17 +41,14 @@ func NewClient(config *Config) (*PlatformClient, error) {
 	userAgent := baseUserAgent() + config.userAgentSuffix()
 
 	httpClient := internal.NewHTTPClient(&internal.HTTPConfig{
-		BaseURL:    config.BaseURL,
-		APIKey:     config.APIKey,
-		APISecret:  config.APISecret,
+		BaseURL:    config.ServicesSchema.DefaultURL,
+		APIKey:     config.APIKey.ID,
+		APISecret:  string(config.APIKey.Secret),
 		HTTPClient: config.HTTPClient,
 		Timeout:    config.Timeout,
 		UserAgent:  userAgent,
+		Logger:     config.Logger,
 	})
-
-	if os.Getenv("YELLOWDOG_DEBUG") == "1" || os.Getenv("YELLOWDOG_DEBUG") == "true" {
-		httpClient.SetDebug(true)
-	}
 
 	client := &PlatformClient{
 		config:     config,
