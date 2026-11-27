@@ -21,7 +21,19 @@
 // set directly, including Timeout, UserAgentProducts, HTTPClient for
 // supplying your own *http.Client, and Logger for logging every request and
 // response in full. [NewClient] validates the configuration and fails if the
-// URL or either part of the API key is missing.
+// URL or either part of the API key is missing, or a Retry setting is
+// negative.
+//
+// # Retries
+//
+// The client retries a request that fails with a rate limit (HTTP 429), a
+// server error (HTTP 500 to 511) or a connection error, so a brief platform
+// restart doesn't fail your program. It waits a random interval before each
+// retry, up to a limit that doubles each time. [DefaultConfig] retries up to 3
+// times, waiting at most 10 seconds before the first retry and at most a minute
+// before any. Change this with the Retry field of [Config], or set its
+// MaxAttempts to 0 to turn retries off. See [Config] for the details. Retries
+// also apply when you supply your own HTTPClient.
 //
 // # Services
 //

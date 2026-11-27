@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/yellowdogai/yellowdog-sdk-go/model"
 )
 
 // Config holds the configuration for the YellowDog Platform Client.
@@ -23,7 +25,21 @@ type Config struct {
 
 	// Timeout is the default timeout for API requests.
 	// If zero, a reasonable default will be used (30 seconds).
+	// It limits each attempt at a request separately, so retries can take a request longer.
 	Timeout time.Duration
+
+	// Retry sets how the client retries a request that fails with a rate limit (HTTP 429), a server error (HTTP 500 to
+	// 511) or a connection error. It retries every method, except a POST that timed out after it was sent, as the
+	// platform may still be processing it, or whose response was cut short, as the platform has already processed it.
+	// Other errors, such as HTTP 401, 403 and 404, are returned straight away.
+	// When retries run out, the last error is returned. Server-sent event streams, behind the clients' listeners,
+	// aren't retried.
+	//
+	// MaxAttempts is the maximum number of retries after the first attempt, so a request is sent at most
+	// MaxAttempts + 1 times. Zero turns retries off. Each wait before a retry is random, between zero and
+	// InitialInterval doubled for each earlier retry, up to MaxInterval. The wait ends early, with the context's error,
+	// when the request's context is done.
+	Retry model.RetryProperties
 
 	// UserAgentProducts that identify the application, e.g. Product{ Name: "my-app", Version: "1.2.0" }.
 	//
@@ -33,8 +49,9 @@ type Config struct {
 	// platform, so YellowDog can provide you with better support.
 	UserAgentProducts []Product
 
-	// Logger receives a debug record for every request and response, with its body. Bodies can hold secrets, such as
-	// cloud provider credentials, so don't enable debug logging in production. If nil, nothing is logged.
+	// Logger receives a debug record for every request and response, with its body, and a warning for every retry.
+	// Bodies can hold secrets, such as cloud provider credentials, so don't enable debug logging in production. If
+	// nil, nothing is logged.
 	Logger *slog.Logger
 }
 
@@ -92,13 +109,20 @@ type Product struct {
 	Version string
 }
 
-// DefaultConfig returns a Config for the given services and API key, with sensible defaults for everything else.
+// DefaultConfig returns a Config for the given services and API key, with sensible defaults for everything else. It
+// retries a failed request up to 3 times, waiting at most 10 seconds before the first retry, doubling to at most a
+// minute.
 func DefaultConfig(servicesSchema ServicesSchema, apiKey APIKey, products ...Product) *Config {
 	return &Config{
-		ServicesSchema:    servicesSchema,
-		APIKey:            apiKey,
-		HTTPClient:        nil,
-		Timeout:           30 * time.Second,
+		ServicesSchema: servicesSchema,
+		APIKey:         apiKey,
+		HTTPClient:     nil,
+		Timeout:        30 * time.Second,
+		Retry: model.RetryProperties{
+			MaxAttempts:     3,
+			InitialInterval: model.Duration(10 * time.Second),
+			MaxInterval:     model.Duration(time.Minute),
+		},
 		UserAgentProducts: products,
 	}
 }
@@ -113,6 +137,15 @@ func (c *Config) Validate() error {
 	}
 	if c.APIKey.Secret == "" {
 		return &ConfigError{Field: "APIKey.Secret", Message: "API key secret is required"}
+	}
+	if c.Retry.MaxAttempts < 0 {
+		return &ConfigError{Field: "Retry.MaxAttempts", Message: "must not be negative"}
+	}
+	if c.Retry.InitialInterval < 0 {
+		return &ConfigError{Field: "Retry.InitialInterval", Message: "must not be negative"}
+	}
+	if c.Retry.MaxInterval < 0 {
+		return &ConfigError{Field: "Retry.MaxInterval", Message: "must not be negative"}
 	}
 	return nil
 }

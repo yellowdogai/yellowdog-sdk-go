@@ -48,6 +48,11 @@ func NewClient(config *Config) (*PlatformClient, error) {
 		Timeout:    config.Timeout,
 		UserAgent:  userAgent,
 		Logger:     config.Logger,
+		Retry: internal.Retry{
+			MaxAttempts:     config.Retry.MaxAttempts,
+			InitialInterval: config.Retry.InitialInterval.ToDuration(),
+			MaxInterval:     config.Retry.MaxInterval.ToDuration(),
+		},
 	})
 
 	client := &PlatformClient{

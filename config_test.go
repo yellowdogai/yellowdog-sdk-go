@@ -3,10 +3,14 @@ package yellowdog
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/yellowdogai/yellowdog-sdk-go/model"
 )
 
 func TestSecretIsRedacted(t *testing.T) {
@@ -33,6 +37,22 @@ func TestSecretIsRedacted(t *testing.T) {
 		}
 		if !strings.Contains(output, "[REDACTED]") {
 			t.Errorf("%s output doesn't say [REDACTED]: %s", name, output)
+		}
+	}
+}
+
+func TestValidateRejectsNegativeRetrySettings(t *testing.T) {
+	for field, retry := range map[string]model.RetryProperties{
+		"Retry.MaxAttempts":     {MaxAttempts: -1},
+		"Retry.InitialInterval": {InitialInterval: model.Duration(-time.Second)},
+		"Retry.MaxInterval":     {MaxInterval: model.Duration(-time.Second)},
+	} {
+		config := DefaultConfig(ServicesSchema{DefaultURL: "https://example.com"}, APIKey{ID: "key", Secret: "secret"})
+		config.Retry = retry
+
+		var configErr *ConfigError
+		if err := config.Validate(); !errors.As(err, &configErr) || configErr.Field != field {
+			t.Errorf("Validate() = %v, want a ConfigError for %s", err, field)
 		}
 	}
 }

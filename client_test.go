@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"regexp"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -88,6 +89,35 @@ func TestRequestsAndResponsesAreLoggedToTheConfiguredLogger(t *testing.T) {
 		if !bytes.Contains(logs.Bytes(), []byte(want)) {
 			t.Errorf("logs do not contain %s:\n%s", want, logs.String())
 		}
+	}
+}
+
+func TestRequestsAreRetriedThroughAnHTTPClientOfYourOwn(t *testing.T) {
+	var requests atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if requests.Add(1) == 1 {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"ns-1","namespace":"example"}`))
+	}))
+	defer server.Close()
+
+	config := DefaultConfig(ServicesSchema{DefaultURL: server.URL}, APIKey{ID: "key", Secret: "secret"})
+	config.HTTPClient = server.Client()
+	config.Retry = model.RetryProperties{MaxAttempts: 1}
+	client, err := NewClient(config)
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+	defer func() { _ = client.Close() }()
+
+	if _, err := client.Namespaces.GetNamespace(context.Background(), "ns-1"); err != nil {
+		t.Fatalf("GetNamespace: %v", err)
+	}
+	if requests.Load() != 2 {
+		t.Errorf("requests = %d, want 2", requests.Load())
 	}
 }
 

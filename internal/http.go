@@ -4,11 +4,16 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
+	"math/rand/v2"
+	"net"
 	"net/http"
+	"net/http/httptrace"
 	"strings"
+	"sync/atomic"
 	"time"
 )
 
@@ -20,6 +25,14 @@ type HTTPConfig struct {
 	Timeout    time.Duration
 	UserAgent  string
 	Logger     *slog.Logger
+	Retry      Retry
+}
+
+// Retry sets how requests are retried after a rate limit, a server error or a connection error.
+type Retry struct {
+	MaxAttempts     int
+	InitialInterval time.Duration
+	MaxInterval     time.Duration
 }
 
 type HTTPClient struct {
@@ -29,6 +42,7 @@ type HTTPClient struct {
 	httpClient *http.Client
 	userAgent  string
 	logger     *slog.Logger
+	retry      Retry
 }
 
 func NewHTTPClient(config *HTTPConfig) *HTTPClient {
@@ -58,6 +72,7 @@ func NewHTTPClient(config *HTTPConfig) *HTTPClient {
 		httpClient: client,
 		userAgent:  config.UserAgent,
 		logger:     logger,
+		retry:      config.Retry,
 	}
 	return hc
 }
@@ -152,9 +167,33 @@ func (c *HTTPClient) requestJSON(ctx context.Context, method, path string, body,
 	return c.doJSON(req, bodyData, result)
 }
 
-const maxResponseSizeBytes = 10 * 1024 * 1024 // 10MB
-
 func (c *HTTPClient) doJSON(req *http.Request, reqBody []byte, result any) error {
+	for retry := 0; ; retry++ {
+		body, sent, err := c.attempt(req, reqBody)
+		if err == nil {
+			return decodeResult(body, result)
+		}
+		if retry == c.retry.MaxAttempts || !isRetryable(req, sent, err) {
+			return err
+		}
+
+		wait := c.backoff(retry)
+		c.logger.Warn("Retrying HTTP request",
+			slog.String("method", req.Method),
+			slog.String("url", req.URL.String()),
+			slog.Int("retry", retry+1),
+			slog.Duration("wait", wait),
+			slog.String("error", err.Error()),
+		)
+		if err := sleep(req.Context(), wait); err != nil {
+			return err
+		}
+	}
+}
+
+// attempt sends one copy of req, with a fresh body, and returns the response body of a 2xx response, and whether
+// the request was sent in full.
+func (c *HTTPClient) attempt(req *http.Request, reqBody []byte) ([]byte, bool, error) {
 	if reqBody == nil {
 		c.logger.Debug("HTTP request",
 			slog.String("method", req.Method),
@@ -169,14 +208,25 @@ func (c *HTTPClient) doJSON(req *http.Request, reqBody []byte, result any) error
 		)
 	}
 
-	resp, err := c.Do(req)
+	var sent atomic.Bool
+	trace := &httptrace.ClientTrace{
+		WroteRequest: func(info httptrace.WroteRequestInfo) { sent.Store(info.Err == nil) },
+	}
+	attemptReq := req.Clone(httptrace.WithClientTrace(req.Context(), trace))
+	if reqBody != nil {
+		attemptReq.Body = io.NopCloser(bytes.NewReader(reqBody))
+	}
+
+	resp, err := c.Do(attemptReq)
 	if err != nil {
-		return fmt.Errorf("executing HTTP request to %s: %w", req.URL, err)
+		return nil, sent.Load(), fmt.Errorf("executing HTTP request to %s: %w", req.URL, err)
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	limitedBody := http.MaxBytesReader(nil, resp.Body, maxResponseSizeBytes)
-	body, _ := io.ReadAll(limitedBody)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, sent.Load(), fmt.Errorf("%w from %s: %w", errReadingResponse, req.URL, err)
+	}
 
 	c.logger.Debug("HTTP response",
 		slog.Int("status", resp.StatusCode),
@@ -186,21 +236,76 @@ func (c *HTTPClient) doJSON(req *http.Request, reqBody []byte, result any) error
 	)
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return newAPIErrorWithBody(resp, body)
+		return nil, sent.Load(), newAPIErrorWithBody(resp, body)
 	}
+	if resp.StatusCode == http.StatusNoContent {
+		return nil, sent.Load(), nil
+	}
+	return body, sent.Load(), nil
+}
 
-	if result != nil && resp.StatusCode != http.StatusNoContent && len(body) > 0 {
-		if s, ok := result.(*string); ok {
-			if err := json.Unmarshal(body, s); err != nil {
-				// API returned a bare (unquoted) string — use it directly.
-				*s = string(body)
-			}
-		} else if err := json.Unmarshal(body, result); err != nil {
-			return fmt.Errorf("decoding response: %w", err)
+func decodeResult(body []byte, result any) error {
+	if result == nil || len(body) == 0 {
+		return nil
+	}
+	if s, ok := result.(*string); ok {
+		if err := json.Unmarshal(body, s); err != nil {
+			// API returned a bare (unquoted) string — use it directly.
+			*s = string(body)
 		}
+	} else if err := json.Unmarshal(body, result); err != nil {
+		return fmt.Errorf("decoding response: %w", err)
+	}
+	return nil
+}
+
+var errReadingResponse = errors.New("reading HTTP response")
+
+// isRetryable reports whether err is likely to pass on a retry: a rate limit, a server error or a connection
+// error. A POST isn't retried once it timed out after it was sent, as the platform may still be processing it, or
+// once its response started, as the platform has processed it.
+func isRetryable(req *http.Request, sent bool, err error) bool {
+	if req.Context().Err() != nil {
+		return false
+	}
+	if req.Method == http.MethodPost && errors.Is(err, errReadingResponse) {
+		return false
 	}
 
-	return nil
+	var apiErr *APIError
+	if errors.As(err, &apiErr) {
+		return apiErr.StatusCode == http.StatusTooManyRequests ||
+			(apiErr.StatusCode >= 500 && apiErr.StatusCode <= 511)
+	}
+
+	var netErr net.Error
+	timedOut := errors.As(err, &netErr) && netErr.Timeout()
+	return req.Method != http.MethodPost || !sent || !timedOut
+}
+
+// backoff returns a random wait before the given retry, counting from zero, using full jitter: between zero and
+// the initial interval doubled for each earlier retry, capped at the maximum interval.
+func (c *HTTPClient) backoff(retry int) time.Duration {
+	limit := c.retry.InitialInterval
+	for i := 0; i < retry && limit < c.retry.MaxInterval; i++ {
+		limit *= 2
+	}
+	limit = min(limit, c.retry.MaxInterval)
+	if limit <= 0 {
+		return 0
+	}
+	return rand.N(limit)
+}
+
+func sleep(ctx context.Context, wait time.Duration) error {
+	timer := time.NewTimer(wait)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
 }
 
 // BaseURL returns the base URL of the HTTP client.
